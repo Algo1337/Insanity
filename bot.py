@@ -492,13 +492,15 @@ class Algo(discord.Client):
                 file_t = ".png"
             
             """
-                Possible formarts:
-                    ;steal --sticker png_name
-                    ;steal --sticker --gif gif_name
-                    ;steal --emoji png_name
-                    ;steal --emoji --gif gif_name
-                    ;steal --image name
-                    ;steal --image --gif name
+                Possible formats:
+                    ;steal --sticker
+                    ;steal --sticker --gif
+                    ;steal --emoji
+                    ;steal --emoji --gif
+                    ;steal --image
+                    ;steal --image --gif
+                    ;steal --avatar
+                    ;steal --avatar --gif
             """
 
             if "--sticker" in args: # Cannot send a sticker with text so from reply
@@ -523,6 +525,10 @@ class Algo(discord.Client):
                 emojis = Temp.get_emojis(message.content.split(" "))
                 for e in emojis: Temp.download_image(f"https://cdn.discordapp.com/emojis/{e}{file_t}", f"images/{e}{file_t}")
                 await message.channel.send(f"Successfully downloaded {len(emojis)} emoji!")
+            
+            elif "--avatar" in args:
+                Temp.download_image(message.mentions[0].display_avatar.url, f"images/{message.mentions[0].name}{file_t}")
+                await message.channel.send(f"Successfully downloaded {args[len(args) - 1]}'s avatar!")
 
                 
                 
