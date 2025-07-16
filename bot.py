@@ -273,10 +273,7 @@ class Algo(discord.Client):
 
             text = " ".join(message.content.split(" ")[1:])
             engine = pyttsx3.init()
-            rate = engine.getProperty('rate')
             engine.setProperty('rate', 125)
-
-            volume = engine.getProperty('volume')
             engine.setProperty('volume', 1.0)
 
             voices = engine.getProperty('voices')
