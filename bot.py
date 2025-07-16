@@ -9,7 +9,7 @@ from gtts import gTTS
 CURRENT_VC = None
 WATCHING_VC = False
 PLAYING = False
-THRESHOLD = 200
+THRESHOLD = 300
 CURRENT_REGION = None
 LAST_REGION_USED = None
 AVAILABLE_REGIONS = [
@@ -106,7 +106,7 @@ class Algo(discord.Client):
         """
         if message.content == ";help":
             await message.delete()
-            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text>\n;yt <url>\n;stop\n;nuke```")
+            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text> (sayvcq for quiet operation)\n;yt <url>\n;stop\n;nuke\n;translate <lang> (Must reply to the message that you want translated)\n;factcheck <question> (Must reply to the message factchecking)```")
             return
         
         """
@@ -458,6 +458,10 @@ class Algo(discord.Client):
                 q = " ".join(message.content.split(' ')[1:]) + "\n"
 
             q += f"{replied_msg.content}\n"
+            print(replied_msg.embeds)
+            print(repr(replied_msg.content))
+            parent = await message.channel.fetch_message(message.reference.message_id)
+            print("Full content:", repr(parent.content))
             data = {
                 "contents": [
                     {
@@ -530,11 +534,6 @@ class Algo(discord.Client):
                 Temp.download_image(message.mentions[0].display_avatar.url, f"images/{message.mentions[0].name}{file_t}")
                 await message.channel.send(f"Successfully downloaded {args[len(args) - 1]}'s avatar!")
 
-                
-                
-
-
-        
 try:
     intents = discord.Intents.all()
     intents.message_content = True

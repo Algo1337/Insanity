@@ -1,4 +1,10 @@
-import discord
+import discord, enum
+
+class Discord_Event_T(enum.Enum):
+    e_joined = 1
+    e_left = 2
+    e_message = 3,
+    e_vc = 4
 
 class DiscordUtils():
     Cmd: str
