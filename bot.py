@@ -39,6 +39,37 @@ GEMINI_HEADERS = {
     "Content-Type": "application/json"
 }
 
+class Temp:
+    def get_emojis(args: list) -> list:
+        emojis = []
+
+        for arg in args:
+            if arg.startswith("<") and arg.endswith(">"):
+                emoji_args = arg.split(":")
+
+                ## <:emoji_name:emoji_id>
+                if len(emoji_args) == 3:
+                    emojis.append(emoji_args[2][:-1])
+                    continue
+                elif len(emoji_args) == 2:
+                    emojis.append(emoji_args[1][:-1])
+                    continue
+
+        return emojis
+
+    def download_image(url: str, output: str) -> int:
+        try:
+            req = requests.get(url)
+            if req.status_code != 200: 
+                print("[ - ] Error, Failed to make the request....!\n")
+            f = open(output, "wb")
+            f.write(req.content)
+            f.close()
+        except:
+            return 0
+        
+        return 1
+
 class Algo(discord.Client):
     async def on_ready(self):
 
@@ -447,6 +478,56 @@ class Algo(discord.Client):
                 await message.reply(text_output)
             else:
                 print("Error:", response.status_code, response.text)
+
+        if message.content.startswith(";steal"):
+            args = message.content.split(" ")
+            if message.reference:
+                replied_msg = await message.channel.fetch_message(message.reference.message_id)
+
+            name = ""
+            file_t = ""
+            if len(args) > 2 and "--gif" in args:
+                file_t = ".gif"
+            else:
+                file_t = ".png"
+            
+            """
+                Possible formarts:
+                    ;steal --sticker png_name
+                    ;steal --sticker --gif gif_name
+                    ;steal --emoji png_name
+                    ;steal --emoji --gif gif_name
+                    ;steal --image name
+                    ;steal --image --gif name
+            """
+
+            if "--sticker" in args: # Cannot send a sticker with text so from reply
+                if not replied_msg:
+                    await message.channel.send("Error, You must reply to the sticker with command!")
+                    return
+                
+                if len(args) > 2:
+                    return
+                
+                for sticker in replied_msg.stickers:
+                    Temp.download_image(sticker.url, sticker.name + file_t)
+
+            elif "--emoji" in args:
+                if message.reference:
+                    replied_msg = await message.channel.fetch_message(message.reference.message_id)
+                    emojis = Temp.get_emojis(replied_msg.content.split(" "))
+                    for e in emojis: Temp.download_image(f"https://cdn.discordapp.com/emojis/{e}{file_t}", f"images/{e}{file_t}")
+                    await message.channel.send(f"Successfully downloaded {len(emojis)} emoji!")
+                    return 
+
+                emojis = Temp.get_emojis(message.content.split(" "))
+                for e in emojis: Temp.download_image(f"https://cdn.discordapp.com/emojis/{e}{file_t}", f"images/{e}{file_t}")
+                await message.channel.send(f"Successfully downloaded {len(emojis)} emoji!")
+
+                
+                
+
+
         
 try:
     intents = discord.Intents.all()
