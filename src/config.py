@@ -54,3 +54,6 @@ class Config:
         f.close()
 
         return t
+    
+    def retrieve_all_commands() -> dict:
+        pass

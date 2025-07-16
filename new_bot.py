@@ -2,8 +2,9 @@ import discord
 
 from src.config import Config
 
-class NCA_Bot(discord.Client):
+class NCA_Bot(discord.Client, Config):
     async def on_ready(self):
+        self.Commands = Config.retrieve_all_commands()
         print(f"[ + ] Firing up {self.user}....!")
 
     async def on_message(self, message):

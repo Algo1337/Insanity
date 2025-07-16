@@ -1,7 +1,9 @@
 import discord, requests, time, pytz, asyncio, random, os, math, pyttsx3, yt_dlp
 
+
 from discord import ChannelType, FFmpegPCMAudio
 from datetime import timezone
+from translatepy import Translator
 from gtts import gTTS
 
 CURRENT_VC = None
@@ -32,8 +34,15 @@ FFMPEG_OPTIONS = {
 
 YDL_OPTIONS = {'format': 'bestaudio'}
 
+GEMINI_HEADERS = {
+    "x-goog-api-key": "AIzaSyAaRnav3DNdEhWlNcc4CO1dpcaZ6OzYChs",
+    "Content-Type": "application/json"
+}
+
 class Algo(discord.Client):
     async def on_ready(self):
+        for guild in self.guilds:
+            print(f"👋 In server: {guild.name}")
         print(f"[ + ] Fired up {self.user}")
 
     async def on_message(self, message):
@@ -43,6 +52,8 @@ class Algo(discord.Client):
         global CURRENT_REGION
         global LAST_REGION_USED
         global AVAILABLE_REGIONS
+        global GEMINI_HEADERS
+
         local_tz = pytz.timezone('America/Kentucky/Louisville')
         print(f"[ + ] Message: \x1b[31m{message.guild.name}/{message.channel.name}\x1b[0m | \x1b[32m{message.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')}\x1b[0m \x1b[33m{message.author.display_name}:{message.author.name}\x1b[0m: {message.content}")
 
@@ -53,7 +64,7 @@ class Algo(discord.Client):
             return
         
         """
-            Restricting to 2 users
+            Restricting to 3 users
         """
         if message.content.startswith(";") and (message.author.id != 1235776145819959318 and message.author.id != 1163512624483405976):
             await message.channel.send("Error, Only the creators can use this bot!")
@@ -65,7 +76,7 @@ class Algo(discord.Client):
         """
         if message.content == ";help":
             await message.delete()
-            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text>\n;yt <url>\n;stop```")
+            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text>\n;yt <url>\n;stop\n;nuke```")
             return
         
         """
@@ -335,12 +346,100 @@ class Algo(discord.Client):
                 return
             
             message.guild.voice_client.stop()
+
+        """
+                [TESTING]: Custom Command
+            @command: -nuke
+        """
+        if message.content == ";nuke":
+            if not message.guild:
+                return
+
+            bot_member = message.guild.me
+            perms = message.channel.permissions_for(bot_member)
+
+            if not perms.manage_channels:
+                await message.channel.send("❌ I need `Manage Channels` permission to do this.")
+                return
+
+            old_channel = message.channel
+            old_category = old_channel.category
+            old_position = old_channel.position
+
+            cloned_channel = await old_channel.clone(reason="Nuked Channel, Remade")
+            await cloned_channel.edit(category=old_category, position=old_position)
+
+            await cloned_channel.send(f"✅ {message.author.mention} nuked")
+            await old_channel.delete(reason="Nuked")
+
+        """
+                [TESTING]: Custom Command
+            @command: -p
+        """
+        if message.content == ";p":
+            pass
+
+        """
+                [TESTING]: Custom Command
+            @command: -translate
+        """
+        if message.content.startswith(";translate"):
+            if " " not in message.content:
+                return
+            
+            args = message.content.split(" ")
+            lang = "en"
+            if len(args) > 1:
+                lang = args[1]
+
+            replied_msg = None
+            if message.reference:
+                replied_msg = message.reference
+
+            translator = Translator()
+            translation = translator.translate(replied_msg.content, lang)
+            await message.channel.send(translation)
+
+        """
+                [TESTING]: Custom Command
+            @command: -factcheck
+        """
+        if message.content.startswith(";factcheck"):
+            if not message.reference:
+                return 
+            
+            replied_msg = await message.channel.fetch_message(message.reference.message_id)
+            q = "Fact-check this\n"
+            if " " in message.content:
+                q = " ".join(message.content.split(' ')[1:]) + "\n"
+
+            q += f"{replied_msg.content}\n"
+            data = {
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": q}
+                        ]
+                    }
+                ]
+            }
+
+            response = requests.post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", headers=GEMINI_HEADERS, json=data)
+            if response.ok:
+                content = response.json()
+                text_output = content["candidates"][0]["content"]["parts"][0]["text"]
+                if len(text_output) > 1996:
+                    await message.reply(text_output[:1996] + "...")
+                    return
+                await message.reply(text_output)
+            else:
+                print("Error:", response.status_code, response.text)
         
 try:
     intents = discord.Intents.all()
     intents.message_content = True
 
     bot = Algo(intents=intents)
-    bot.run("MTM3MDA3ODk4MzQ3MDg0MTkyNw.GVxS8M._lRStsHT1LPHi2eZqpdAFjT7waAk7v2FiDeYgs")
+    bot.run("MTM3MDA3ODk4MzQ3MDg0MTkyNw.GiOSsU.UOoDdMXUVaBRy27KU3CvTrw-eW9EqFBtnKfdr8")
 except KeyboardInterrupt:
     exit(0)
