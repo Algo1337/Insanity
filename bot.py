@@ -41,8 +41,7 @@ GEMINI_HEADERS = {
 
 class Algo(discord.Client):
     async def on_ready(self):
-        for guild in self.guilds:
-            print(f"👋 In server: {guild.name}")
+
         print(f"[ + ] Fired up {self.user}")
 
     async def on_message(self, message):
@@ -94,6 +93,18 @@ class Algo(discord.Client):
                 if msg.author.id == self.user.id:
                     await msg.delete()
                     time.sleep(1)
+
+        """
+                [TESTING]: Custom Command
+            @command: -servers
+        """
+        if message.content == ";servers":
+            servers = ""
+            for guild in self.guilds:
+                servers += f"{guild.name}\n"
+
+            await message.channel.send(f"> - List of servers\n\n```{servers}```")
+
 
         """
                 [TESTING]: Custom Command
@@ -393,8 +404,10 @@ class Algo(discord.Client):
                 lang = args[1]
 
             replied_msg = None
-            if message.reference:
-                replied_msg = message.reference
+            if not message.reference:
+                return
+            
+            replied_msg = await message.channel.fetch_message(message.reference.message_id)
 
             translator = Translator()
             translation = translator.translate(replied_msg.content, lang)
