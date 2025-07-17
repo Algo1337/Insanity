@@ -1,6 +1,6 @@
-import discord, requests, time, pytz, asyncio, random, os, math, pyttsx3, yt_dlp
+import discord, requests, time, pytz, asyncio, random, os, math, pyttsx3, yt_dlp, imageio
 
-
+from PIL import Image
 from discord import ChannelType, FFmpegPCMAudio
 from datetime import timezone
 from translatepy import Translator
@@ -38,6 +38,76 @@ GEMINI_HEADERS = {
     "x-goog-api-key": "AIzaSyAaRnav3DNdEhWlNcc4CO1dpcaZ6OzYChs",
     "Content-Type": "application/json"
 }
+
+MAX_SIZE = 512 * 1024  # 512KB
+RESIZE_STEP = 0.9
+GIF_FPS = 15
+
+class Compressor():
+    def compress_image(name: str):
+        path = name
+        ext = os.path.splitext(path)[1].lower()
+
+        if ext == ".png":
+            out = Compressor.compress_png(path)
+        elif ext == ".gif":
+            out = Compressor.compress_gif(path)
+        else:
+            print("Unsupported file type. Use PNG or GIF.")
+            return
+
+        print(f"Successfully compressed!")
+
+    def compress_png(input_path):
+        global MAX_SIZE
+        global RESIZE_STEP
+        global GIF_FPS
+        img = Image.open(input_path)
+        quality = 90
+        scale = 1.0
+
+        while True:
+            temp_path = "test.png"
+            resized = img.resize((int(img.width * scale), int(img.height * scale)), Image.LANCZOS)
+            resized.save(temp_path, optimize=True)
+
+            if os.path.getsize(temp_path) <= MAX_SIZE or scale < 0.1:
+                print(f"[✓] PNG compressed to {os.path.getsize(temp_path) / 1024:.1f} KB")
+                return temp_path
+
+            scale *= RESIZE_STEP  # reduce size
+
+    def compress_gif(input_path):
+        global MAX_SIZE
+        global RESIZE_STEP
+        global GIF_FPS
+        reader = imageio.get_reader(input_path)
+        frames = []
+        scale = 1.0
+
+        while True:
+            frames.clear()
+            for frame in reader:
+                image = Image.fromarray(frame)
+                image = image.resize((int(image.width * scale), int(image.height * scale)), Image.LANCZOS)
+                frames.append(image)
+
+            temp_path = "test.gif"
+            frames[0].save(
+                temp_path,
+                save_all=True,
+                append_images=frames[1:],
+                loop=0,
+                optimize=True,
+                duration=int(1000 / GIF_FPS),
+                disposal=2
+            )
+
+            if os.path.getsize(temp_path) <= MAX_SIZE or scale < 0.1:
+                print(f"[✓] GIF compressed to {os.path.getsize(temp_path) / 1024:.1f} KB")
+                return temp_path
+
+            scale *= RESIZE_STEP  # reduce size
 
 class Temp:
     def get_emojis(args: list) -> list:
@@ -409,10 +479,19 @@ class Algo(discord.Client):
             old_position = old_channel.position
 
             cloned_channel = await old_channel.clone(reason="Nuked Channel, Remade")
-            await cloned_channel.edit(category=old_category, position=old_position)
+            await cloned_channel.edit(category=old_category, position=old_position, topic="NCA ON TOP!")
 
             await cloned_channel.send(f"✅ {message.author.mention} nuked")
             await old_channel.delete(reason="Nuked")
+
+        if message.content.startswith(";topic"):
+            if " " not in message.content:
+                return
+
+            text = " ".join(message.content.split(" ")[1:])
+            await message.channel.edit(topic = text)
+            await message.channel.send("Topic Set")
+
 
         """
                 [TESTING]: Custom Command
@@ -458,10 +537,6 @@ class Algo(discord.Client):
                 q = " ".join(message.content.split(' ')[1:]) + "\n"
 
             q += f"{replied_msg.content}\n"
-            print(replied_msg.embeds)
-            print(repr(replied_msg.content))
-            parent = await message.channel.fetch_message(message.reference.message_id)
-            print("Full content:", repr(parent.content))
             data = {
                 "contents": [
                     {
@@ -483,6 +558,39 @@ class Algo(discord.Client):
             else:
                 print("Error:", response.status_code, response.text)
 
+        """
+                [TESTING]: Custom Command
+            @command: -ai
+        """
+        if message.content.startswith(";ai"):
+            if " " not in message.content:
+                return
+            
+            data = {
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": " ".join(message.content.split(" ")[1:])}
+                        ]
+                    }
+                ]
+            }
+
+            response = requests.post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", headers=GEMINI_HEADERS, json=data)
+            if response.ok:
+                content = response.json()
+                text_output = content["candidates"][0]["content"]["parts"][0]["text"]
+                if len(text_output) > 1996:
+                    await message.reply(text_output[:1996] + "...")
+                    return
+                await message.reply(text_output)
+            else:
+                print("Error:", response.status_code, response.text)
+
+        """
+                [TESTING]: Custom Command
+            @command: -steal
+        """
         if message.content.startswith(";steal"):
             args = message.content.split(" ")
             if message.reference:
@@ -516,7 +624,7 @@ class Algo(discord.Client):
                     return
                 
                 for sticker in replied_msg.stickers:
-                    Temp.download_image(sticker.url, sticker.name + file_t)
+                    Temp.download_image(sticker.url, f"images/{sticker.name}{file_t}")
 
             elif "--emoji" in args:
                 if message.reference:
@@ -531,12 +639,43 @@ class Algo(discord.Client):
                 await message.channel.send(f"Successfully downloaded {len(emojis)} emoji!")
 
             elif "--link" in args:
+                url = args[1]
+                if message.reference:
                     replied_msg = await message.channel.fetch_message(message.reference.message_id)
-                Temp.download_image(replied_msg.content)
+                    url = replied_msg.content
+
+                file_t = ".png"
+                if "--gif" in args:
+                    file_t = ".gif"
+
+                Temp.download_image(url, f"images/dadadad_{random.randint(1, 999999)}{file_t}")
+                await message.channel.send("Image saved!")
             
             elif "--avatar" in args:
                 Temp.download_image(message.mentions[0].display_avatar.url, f"images/{message.mentions[0].name}{file_t}")
                 await message.channel.send(f"Successfully downloaded {args[len(args) - 1]}'s avatar!")
+
+        """
+                [TESTING]: Custom Command
+            @command: -compress
+        """
+        if message.content.startswith(";compress"):
+            args = message.content.split(" ")
+            url = args[1]
+            if message.reference:
+                replied_msg = await message.channel.fetch_message(message.reference.message_id)
+                if replied_msg:
+                    url = replied_msg.content
+            
+            file_t = ".png"
+            if args[len(args) - 1] == "--gif":
+                file_t = ".gif"
+            
+            path = f"test{file_t}"
+            await message.channel.send(f"Downloading image...")
+            Temp.download_image(url, path)
+            Compressor.compress_image(path)
+            await message.channel.send(f"Successfully adjusted the {file_t[1:]} to sticker/emoji requirement 512KB", file = discord.File(path, filename=path))
 
 try:
     intents = discord.Intents.all()
