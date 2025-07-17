@@ -1,16 +1,18 @@
 import discord, enum, requests
 
 class Discord_Event_T(enum.Enum):
-    e_joined = 1
-    e_left = 2
-    e_message = 3,
-    e_vc = 4
+    e_none      = 0
+    e_joined    = 1
+    e_left      = 2
+    e_message   = 3,
+    e_vc        = 4
 
 class DiscordUtils():
-    Cmd: str
-    Args: list[str]
-    Data: str
-    Client = None
+    Cmd: str                    = ""
+    Args: list[str]             = []
+    Data: str                   = ""
+    Client                      = None
+    Client_T: Discord_Event_T   = Discord_Event_T.e_none
     def __init__(self, message):
         self.Client = message
         self.Data = message.content
@@ -20,6 +22,20 @@ class DiscordUtils():
         else:
             self.Args = []
             self.Cmd = self.Data
+
+    async def send_message(self, text: str, file = None, files = None) -> bool:
+        if not text or text == "":
+            return False
+        
+        try:
+            await self.Client.channel.send(text, file = file, files = files)
+        except:
+            return False
+        
+        return False
+    
+    async def send_embed(title: str, desc: str, image: str = None, images: list[str] = None) -> bool:
+        pass
 
     def get_emojis(self) -> list:
         emojis = []
