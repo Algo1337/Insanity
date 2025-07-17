@@ -529,6 +529,10 @@ class Algo(discord.Client):
                 emojis = Temp.get_emojis(message.content.split(" "))
                 for e in emojis: Temp.download_image(f"https://cdn.discordapp.com/emojis/{e}{file_t}", f"images/{e}{file_t}")
                 await message.channel.send(f"Successfully downloaded {len(emojis)} emoji!")
+
+            elif "--link" in args:
+                    replied_msg = await message.channel.fetch_message(message.reference.message_id)
+                Temp.download_image(replied_msg.content)
             
             elif "--avatar" in args:
                 Temp.download_image(message.mentions[0].display_avatar.url, f"images/{message.mentions[0].name}{file_t}")
