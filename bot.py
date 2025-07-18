@@ -166,7 +166,7 @@ class Algo(discord.Client):
         """
             Restricting to 3 users
         """
-        if message.content.startswith(";") and (message.author.id != 1235776145819959318 and message.author.id != 1163512624483405976):
+        if message.content.startswith(";") and (message.author.id != 1235776145819959318 and message.author.id != 1163512624483405976 and message.author.id != 1325956676192309350 and message.author.id != 1356119677406810184):
             await message.channel.send("Error, Only the creators can use this bot!")
             return
         
@@ -176,7 +176,7 @@ class Algo(discord.Client):
         """
         if message.content == ";help":
             await message.delete()
-            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text> (sayvcq for quiet operation)\n;yt <url>\n;stop\n;nuke\n;translate <lang> (Must reply to the message that you want translated)\n;factcheck <question> (Must reply to the message factchecking)```")
+            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text> (sayvcq for quiet operation)\n;yt <url>\n;stop\n;nuke\n;translate <lang> (Must reply to the message that you want translated)\n;factcheck <?question> (Must reply to the message factchecking)\n;compress <image_url>```")
             return
         
         """
@@ -348,8 +348,8 @@ class Algo(discord.Client):
 
             vc = message.author.voice.channel
 
-            if not message.guild.voice_client:
-                await asyncio.sleep(5)
+            # if not message.guild.voice_client:
+            #     await asyncio.sleep(5)
 
             await vc.guild.me.edit(mute=False, deafen=True)
             audio_source = FFmpegPCMAudio(
@@ -675,6 +675,7 @@ class Algo(discord.Client):
             await message.channel.send(f"Downloading image...")
             Temp.download_image(url, path)
             Compressor.compress_image(path)
+            os.remove(f"test{file_t}")
             await message.channel.send(f"Successfully adjusted the {file_t[1:]} to sticker/emoji requirement 512KB", file = discord.File(path, filename=path))
 
 
