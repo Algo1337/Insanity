@@ -807,6 +807,6 @@ try:
     intents.message_content = True
 
     bot = Algo(intents=intents)
-    bot.run("MTM3MDA3ODk4MzQ3MDg0MTkyNw.GiOSsU.UOoDdMXUVaBRy27KU3CvTrw-eW9EqFBtnKfdr8")
+    bot.run("")
 except KeyboardInterrupt:
     exit(0)
