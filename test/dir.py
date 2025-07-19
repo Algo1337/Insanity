@@ -1,16 +1,20 @@
 import os, sys
 
 CommandsDir = "/src/cmds/"
-CURRENT_DIR = os.getcwd() + CommandsDir
 
 Files = {}
 
+"""
+    {
+        "file": "filepath"
+    }
+"""
 def check_dir(dir: str) -> int:
-    if dir == "":
-        return 0
+    CURRENT_DIR = os.getcwd() + dir
+    if not dir or dir == "":
+        return
 
-    global Files
-    global CURRENT_DIR
+    Files = {}
 
     dir_list = os.listdir(CURRENT_DIR)
     for item in dir_list:
@@ -21,12 +25,9 @@ def check_dir(dir: str) -> int:
             check_dir(CURRENT_DIR)
             CURRENT_DIR = CURRENT_DIR.replace(f"/{item}", "")
 
-    return 1
+    if len(Files) > 0:
+        return Files
+    
+    return {}
 
-check_dir(CURRENT_DIR)
-for file in Files:
-    print(f"{file} | {Files[file]}")
-
-# if len(sys.argv) < 2:
-#     print(f"[ x ] Error, Invalid arguments\nUsage: {sys.argv[0]} <commands_dir>")
-#     exit(0)
+check_dir(CommandsDir)

@@ -48,12 +48,15 @@ class Compressor():
         path = name
         ext = os.path.splitext(path)[1].lower()
 
-        if ext == ".png":
-            out = Compressor.compress_png(path)
-        elif ext == ".gif":
-            out = Compressor.compress_gif(path)
-        else:
-            print("Unsupported file type. Use PNG or GIF.")
+        try:
+            if ext == ".png":
+                out = Compressor.compress_png(path)
+            elif ext == ".gif":
+                out = Compressor.compress_gif(path)
+            else:
+                print("Unsupported file type. Use PNG or GIF.")
+                return
+        except:
             return
 
         print(f"Successfully compressed!")
@@ -81,16 +84,25 @@ class Compressor():
         global MAX_SIZE
         global RESIZE_STEP
         global GIF_FPS
-        reader = imageio.get_reader(input_path)
-        frames = []
+
         scale = 1.0
 
         while True:
-            frames.clear()
-            for frame in reader:
-                image = Image.fromarray(frame)
-                image = image.resize((int(image.width * scale), int(image.height * scale)), Image.LANCZOS)
-                frames.append(image)
+            frames = []
+
+            try:
+                reader = imageio.get_reader(input_path)
+                for frame in reader:
+                    image = Image.fromarray(frame)
+                    image = image.resize((int(image.width * scale), int(image.height * scale)), Image.LANCZOS)
+                    frames.append(image)
+            except Exception as e:
+                print(f"[!] Failed to read GIF: {e}")
+                return None
+
+            if not frames:
+                print("[!] No frames found in GIF.")
+                return None
 
             temp_path = "test.gif"
             frames[0].save(
@@ -107,7 +119,7 @@ class Compressor():
                 print(f"[✓] GIF compressed to {os.path.getsize(temp_path) / 1024:.1f} KB")
                 return temp_path
 
-            scale *= RESIZE_STEP  # reduce size
+            scale *= RESIZE_STEP
 
 class Temp:
     def get_emojis(args: list) -> list:
@@ -176,22 +188,49 @@ class Algo(discord.Client):
         """
         if message.content == ";help":
             await message.delete()
-            await message.channel.send("> - List of commands\n```\n;help\n;clean <?amount> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text> (sayvcq for quiet operation)\n;yt <url>\n;stop\n;nuke\n;translate <lang> (Must reply to the message that you want translated)\n;factcheck <?question> (Must reply to the message factchecking)\n;compress <image_url>```")
+            await message.channel.send("> - List of commands | Keep in mind: ``?`` stands for optional argument\n```\n;help\n;clean <?count> <?@user> (delete this bot's messages only)\n;join\n;watchvc <vc_id>\n;switch\n;leavevc\n;vcsay <text> (vcsayq for quiet operation)\n;sayvc <text> (sayvcq for quiet operation)\n;yt <url>\n;stop\n;nuke\n;translate <lang> (Must reply to the message that you want translated)\n;factcheck <?question> (Must reply to the message factchecking)\n;compress <image_url> <png/gif>```")
             return
+
+        if message.content.startswith(";say"):
+            await message.delete()
+            if " " not in message.content:
+                await message.channel.send("Error, Must provide what you want said!\n;say <?channel> <text>")
+
+            args = message.content.split(" ")
+            channel = message.channel
+            text = " ".join(args[1:])
+            if len(args) > 1:
+                if args[1].startswith("<#") and args[1].endswith(">"):
+                    channel = self.get_channel(int(args[1].replace("<#", "").replace(">", "")))
+                    text = " ".join(args[2:])
+
+            await channel.send(text)
         
         """
                 [TESTING]: Custom Command
             @command: -clean
         """
-        if message.content == ";clean":
+        if message.content.startswith(";clean"):
             await message.delete()
 
+            args = message.content.split(" ")
+            user_id = self.user.id
             msg_count = 100
-            if " " in message.content:
-                msg_count = int(message.content.split(" ")[1])
+
+            """
+                ;clean 
+                ;clean <?count>
+                ;clean <?count> <@user>
+            """
+            if len(args)> 0:
+                if args[1].isdigit():
+                    msg_count = int(args[1])
+
+            if len(args) > 2:
+                user_id = int(args[2].replace("<", "").replace("@", "").replace(">", ""))
 
             async for msg in message.channel.history(limit=msg_count, oldest_first=False):
-                if msg.author.id == self.user.id:
+                if msg.author.id == user_id:
                     await msg.delete()
                     time.sleep(1)
 
@@ -342,21 +381,21 @@ class Algo(discord.Client):
             elif message.guild.voice_client != message.author.voice:
                 await message.guild.voice_client.move_to(message.author.voice.channel)
             
-            text = " ".join(message.content.split(" ")[1:])
+            volume = 5
+            text = " ".join(args[1:])
+            if args[1].isdigit():
+                volume = int(args[1])
+                text = " ".join(args[2:])
+            else:
+                text = " ".join(args[1:])
+                
             tts = gTTS(text, lang='en', tld='co.uk')
             tts.save("test.mp3")
 
             vc = message.author.voice.channel
-
-            # if not message.guild.voice_client:
-            #     await asyncio.sleep(5)
-
             await vc.guild.me.edit(mute=False, deafen=True)
-            audio_source = FFmpegPCMAudio(
-                "test.mp3",
-                options='-filter:a "volume=5"'
-            )
-            message.guild.voice_client.play(audio_source, after=lambda e: print("Done"))
+            audio_source = FFmpegPCMAudio("test.mp3", options= f'-filter:a "volume={volume}"')
+            message.guild.voice_client.play(audio_source)
             while message.guild.voice_client.is_playing():
                 await asyncio.sleep(1)
 
@@ -390,26 +429,36 @@ class Algo(discord.Client):
                 await message.guild.voice_client.move_to(message.author.voice.channel)
 
             vc = message.author.voice.channel
-            
-            if not message.guild.voice_client:
-                await asyncio.sleep(5)
+            gender = 0 ## Male
+            if "--female" in message.content:
+                gender = 1
 
-            text = " ".join(message.content.split(" ")[1:])
+            volume = 5
+            args = message.content.split(" ")
+            text = " ".join(args[1:]).replace("--female", "")
+            if args[1].isdigit():
+                volume = int(args[1])
+                text = " ".join(args[2:]).replace("--female", "")
+            else:
+                text = " ".join(args[1:]).replace("--female", "")
+
             engine = pyttsx3.init()
             engine.setProperty('rate', 125)
             engine.setProperty('volume', 1.0)
 
             voices = engine.getProperty('voices')
-            engine.setProperty('voice', voices[0].id)
+            # for voice in voices:
+            #     if voice.id == "roa/es-419":
+            #         engine.setProperty('voice', voice.id)
+            #     print(f"{voice.id} | {voice.name} | {voice.languages} | {voice.gender} | {voice.age}")
+
+            engine.setProperty('voice', voices[gender].id)
             engine.save_to_file(text, 'test.mp3')
             engine.runAndWait()
             
             await vc.guild.me.edit(mute=False, deafen=True)
             await asyncio.sleep(5)
-            audio_source = FFmpegPCMAudio(
-                "test.mp3",
-                options='-filter:a "volume=5"'
-            )
+            audio_source = FFmpegPCMAudio("test.mp3", options=f'-filter:a "volume={volume}"')
             message.guild.voice_client.play(audio_source, after=lambda e: print("Done"))
             while message.guild.voice_client.is_playing():
                 await asyncio.sleep(1)
@@ -490,6 +539,14 @@ class Algo(discord.Client):
 
             text = " ".join(message.content.split(" ")[1:])
             await message.channel.edit(topic = text)
+            await message.channel.send("Topic Set")
+
+        if message.content.startswith(";vctopic"):
+            if " " not in message.content:
+                return
+
+            text = " ".join(message.content.split(" ")[1:])
+            await message.author.voice.channel.edit(topic = text)
             await message.channel.send("Topic Set")
 
 
@@ -675,8 +732,8 @@ class Algo(discord.Client):
             await message.channel.send(f"Downloading image...")
             Temp.download_image(url, path)
             Compressor.compress_image(path)
-            os.remove(f"test{file_t}")
             await message.channel.send(f"Successfully adjusted the {file_t[1:]} to sticker/emoji requirement 512KB", file = discord.File(path, filename=path))
+            os.remove(f"test{file_t}")
 
 
 
