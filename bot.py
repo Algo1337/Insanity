@@ -5,6 +5,10 @@ from discord import ChannelType, FFmpegPCMAudio
 from datetime import timezone
 from translatepy import Translator
 from gtts import gTTS
+from PIL import Image
+import imageio
+import numpy as np
+from rembg import remove
 
 CURRENT_VC = None
 WATCHING_VC = False
@@ -42,6 +46,8 @@ GEMINI_HEADERS = {
 MAX_SIZE = 512 * 1024  # 512KB
 RESIZE_STEP = 0.9
 GIF_FPS = 15
+
+BLACKLISTED_TOKENS = []
 
 class Compressor():
     def compress_image(name: str):
@@ -122,6 +128,25 @@ class Compressor():
             scale *= RESIZE_STEP
 
 class Temp:
+    gif_path: str       = "NCA-Bot/test.gif"
+    output_path: str    = 'output.gif'
+    def get_token() -> str:
+        f = open("token.cfg", "r")
+        t = f.read()
+        f.close()
+
+        return t
+
+    def get_flag_value(args: list, flag: str) -> str:
+        count = 0
+        for arg in args:
+            if arg == flag:
+                return args[count + 1]
+            
+            count += 1
+
+        return ""
+    
     def get_emojis(args: list) -> list:
         emojis = []
 
@@ -151,6 +176,31 @@ class Temp:
             return 0
         
         return 1
+
+    def remove_bg_from_gif() -> None:
+        reader = imageio.get_reader(self.gif_path)
+        frames = []
+
+        for i, frame in enumerate(reader):
+            # Convert frame to PIL image
+            pil_img = Image.fromarray(frame)
+
+            # Remove background
+            img_bytes = pil_img.convert("RGBA").tobytes()
+            input_pil = pil_img.convert("RGBA")
+            output_pil = remove(input_pil)
+
+            # Append processed frame
+            frames.append(output_pil)
+
+        # Save output as new GIF
+        frames[0].save(self.output_path,
+                    save_all=True,
+                    append_images=frames[1:],
+                    duration=reader.get_meta_data()['duration'],
+                    loop=0,
+                    disposal=2)
+
 
 class Algo(discord.Client):
     async def on_ready(self):
@@ -205,7 +255,7 @@ class Algo(discord.Client):
                     text = " ".join(args[2:])
 
             await channel.send(text)
-        
+
         """
                 [TESTING]: Custom Command
             @command: -clean
@@ -381,6 +431,7 @@ class Algo(discord.Client):
             elif message.guild.voice_client != message.author.voice:
                 await message.guild.voice_client.move_to(message.author.voice.channel)
             
+            args = message.content.split(" ")
             volume = 5
             text = " ".join(args[1:])
             if args[1].isdigit():
@@ -410,7 +461,7 @@ class Algo(discord.Client):
                 [TESTING]: Custom Command
             @command: -sayvc
         """
-        if message.content.startswith(";sayvc"):
+        if message.content.startswith(";vcs"):
             await message.delete()
 
             """ Check for arguments """
@@ -469,6 +520,17 @@ class Algo(discord.Client):
                 return
             
             await message.channel.send(f"[ + ] TTS \"{text}\" Done")
+
+        if message.content == ";voices":
+            engine = pyttsx3.init()
+            engine.setProperty('rate', 125)
+            engine.setProperty('volume', 1.0)
+            voices = ""
+            choices = engine.getProperty('voices')
+            for voice in choices:
+                voices += f"> - {voice.id} | {voice.name} | {voice.languages} | {voice.gender}\n"
+
+            await message.channel.send(f"**List of voices**\n{voices[:1950]}")
 
         """
                 [TESTING]: Custom Command
@@ -637,9 +699,15 @@ class Algo(discord.Client):
             if response.ok:
                 content = response.json()
                 text_output = content["candidates"][0]["content"]["parts"][0]["text"]
-                if len(text_output) > 1996:
-                    await message.reply(text_output[:1996] + "...")
-                    return
+                resp_len = len(text_output)
+                for i in range(0, resp_len):
+                    if i + 1996 > resp_len:
+                        await message.channel.send(text_output[i : resp_len])
+                        break
+
+                    await message.channel.send(text_output[i : i + 1996])
+                    i += 1996
+
                 await message.reply(text_output)
             else:
                 print("Error:", response.status_code, response.text)
@@ -649,6 +717,8 @@ class Algo(discord.Client):
             @command: -steal
         """
         if message.content.startswith(";steal"):
+            await message.delete()
+
             args = message.content.split(" ")
             if message.reference:
                 replied_msg = await message.channel.fetch_message(message.reference.message_id)
@@ -709,7 +779,7 @@ class Algo(discord.Client):
                 await message.channel.send("Image saved!")
             
             elif "--avatar" in args:
-                Temp.download_image(message.mentions[0].display_avatar.url, f"images/{message.mentions[0].name}{file_t}")
+                Temp.download_image(message.mentions[0].display_avatar.url, f"images/{message.mentions[0].id}{file_t}")
                 await message.channel.send(f"Successfully downloaded {args[len(args) - 1]}'s avatar!")
 
         """
@@ -734,6 +804,10 @@ class Algo(discord.Client):
             Compressor.compress_image(path)
             await message.channel.send(f"Successfully adjusted the {file_t[1:]} to sticker/emoji requirement 512KB", file = discord.File(path, filename=path))
             os.remove(f"test{file_t}")
+
+        # if message.content == ";test":
+            # for attachment in message.attachments:
+
 
 
 
@@ -807,6 +881,6 @@ try:
     intents.message_content = True
 
     bot = Algo(intents=intents)
-    bot.run("")
+    bot.run(Temp.get_token())
 except KeyboardInterrupt:
     exit(0)
