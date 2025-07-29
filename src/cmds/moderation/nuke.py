@@ -1,6 +1,6 @@
 import discord
 
-from ...discord_utils import *
+from src.discord_utils import *
 
 """
     @Command: nuke
@@ -10,5 +10,5 @@ from ...discord_utils import *
         ;nuke <msg_count>                                   # Delete upto msg_count
         ;nuke --user <@tag> <?count(Default set to 100)>    # Delete user's messages up a count, 100 if not provided
 """
-async def nuke(client: DiscordUtils) -> None:
-    pass
+async def nuke(client: DiscordUtils) -> bool:
+    return True

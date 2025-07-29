@@ -13,15 +13,17 @@ class DiscordUtils():
     Data: str                   = ""
     Client                      = None
     Client_T: Discord_Event_T   = Discord_Event_T.e_none
-    def __init__(self, message):
-        self.Client = message
-        self.Data = message.content
-        if " " in self.Data:
-            self.Args = self.Data.splt(" ")
-            self.Cmd = self.Args[0]
-        else:
-            self.Args = []
-            self.Cmd = self.Data
+    def __init__(self, message, event_t: Discord_Event_T):
+        if event_t == Discord_Event_T.e_message:
+            self.Client = message
+            self.Data = message.content
+            self.Client_T = event_t
+            if " " in self.Data:
+                self.Args = self.Data.split(" ")
+                self.Cmd = self.Args[0]
+            else:
+                self.Args = []
+                self.Cmd = self.Data
 
     async def send_message(self, text: str, file = None, files = None) -> bool:
         if not text or text == "":
@@ -34,8 +36,16 @@ class DiscordUtils():
         
         return False
     
-    async def send_embed(title: str, desc: str, image: str = None, images: list[str] = None) -> bool:
-        pass
+    async def send_embed(self, title: str, desc: str, fields: dict = None, image: str = None, images: list[str] = None) -> bool:
+        embed = discord.Embed(title = title, description = desc, color = discord.Colour.red())
+
+        for field in fields:
+            if isinstance(fields[field], list):
+                embed.add_field(name = field, value = fields[field][0], inline = fields[field][1])
+            else:
+                embed.add_field(name = field, value = fields[field], inline = False)
+
+        await self.Client.channel.send(embed = embed)
 
     def get_emojis(self) -> list:
         emojis = []
