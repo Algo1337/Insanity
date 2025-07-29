@@ -7,6 +7,10 @@ class Insanity(discord.Client, Config):
     async def on_ready(self):
         self.Cmds = []
         self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)
+        await self.change_presence(
+            status = discord.Status.dnd,
+            activity = discord.Streaming(name = "Insanity API Streaming", url = "https://insanity.bot")
+        )
         print(f"[ + ] Firing up {self.user}....!")
 
         for cmd in self.Cmds:
@@ -14,6 +18,9 @@ class Insanity(discord.Client, Config):
 
             if cmd.name == "__on_message__":
                 self.OnMessageHandler = cmd.handler
+
+    async def on_join(self, vc):
+        pass
 
     async def on_message(self, message):
         msg = DiscordUtils(message, Discord_Event_T.e_message)
