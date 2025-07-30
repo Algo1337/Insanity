@@ -27,6 +27,7 @@ async def help(message: DiscordUtils):
         return
 
     await message.send_embed("Help", "A list of categories of commands", {
+        "Info": "```;help -info",
         "Fun": "```;help -fun```",
         "VC": "```;help -vc```",
         "Mod": "```;help -mod```",

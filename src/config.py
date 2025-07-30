@@ -6,8 +6,9 @@ class Cog:
     invalid_args_err    = ""
     lib: None
     handler: None
-    ArgCount: int
-    ArgErr: str
+    ArgCount: int       = 0
+    ArgErr: str         = ""
+    SendBase: int       = 0
     filepath: str       = ""
     def __init__(self, name: str, cmd: str, lib, filepath: str, invalid_args_err: str = ""):
         self.name = name
@@ -16,15 +17,14 @@ class Cog:
         if hasattr(self.lib, self.cmd):
             self.handler = getattr(lib, self.cmd)
 
+        if hasattr(lib, f"__{self.cmd.upper()}_GET_BASE__"):
+            self.SendBase = getattr(self.lib, f"__{self.cmd.upper()}_GET_BASE__")
+
         if hasattr(lib, f"__{self.cmd.upper()}_ARG_COUNT__"):
             self.ArgCount = getattr(self.lib, f"__{self.cmd.upper()}_ARG_COUNT__")
-        else:
-            self.ArgCount = 0
 
         if hasattr(lib, f"__{self.cmd.upper()}_INVALID_ARG_ERR__"):
             self.ArgErr = getattr(self.lib, f"__{self.cmd.upper()}_INVALID_ARG_ERR__")
-        else:
-            self.ArgErr = ""
 
         self.filepath = filepath
         self.invalid_args_err = invalid_args_err

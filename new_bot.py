@@ -4,6 +4,11 @@ from src.config import *
 from src.discord_utils import *
 
 class Insanity(discord.Client, Config):
+    Cmds:               list[str] = []
+    Commands:           list[Cog] = []
+    OnMessage:          Cog
+    OnMessageDelete:    Cog
+    Whitlist:           list[int] = []
     async def on_ready(self):
         self.Cmds = []
         self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)
@@ -17,26 +22,50 @@ class Insanity(discord.Client, Config):
             print(f"Cmd: {cmd.name} loaded....!")
 
             if cmd.name == "__on_message__":
-                self.OnMessageHandler = cmd.handler
+                self.OnMessage = cmd
+
+            if cmd.name == "__on_message_delete__":
+                self.OnMessageDelete = cmd
 
     async def on_join(self, vc):
         pass
 
+    async def on_message_delete(self, message):
+        msg = DiscordUtils(self, message, Discord_Event_T.e_message_del)
+        if self.OnMessageDelete:
+            if self.OnMessageDelete.SendBase:
+                if (await self.OnMessageDelete.handler(self, msg)) == False:
+                    return
+                
+            else:
+                if (await self.OnMessageDelete.handler(msg)) == False:
+                    return
+
     async def on_message(self, message):
-        msg = DiscordUtils(message, Discord_Event_T.e_message)
-        if self.OnMessageHandler and (await self.OnMessageHandler(msg)) == False:
-            return
+        msg = DiscordUtils(self, message, Discord_Event_T.e_message)
+        if self.OnMessage:
+            if self.OnMessage.SendBase:
+                if (await self.OnMessage.handler(self, msg)) == False:
+                    return
+                
+            else:
+                if (await self.OnMessage.handler(msg)) == False:
+                    return
 
         for cmd in self.Cmds:
             if cmd.name.startswith("__"):
                 continue
             
             if f"{Config.PREFIX}{cmd.name}" == msg.Cmd and cmd.ArgCount == 0:
-                await cmd.handler(msg)
+                if cmd.SendBase != 0 and cmd.SendBase != None:
+                    await cmd.handler(self, msg)
+                else:
+                    await cmd.handler(msg)
+
                 break
 
             if f"{Config.PREFIX}{cmd.name}" == msg.Cmd:
-                if cmd.ArrCount > 0 and len(msg.Args) != cmd.ArgCount:
+                if cmd.ArgCount > 0 and len(msg.Args) < cmd.ArgCount:
                     if isinstance(cmd.ArgErr, discord.Embed):
                         await message.channel.send(embed = cmd.ArgErr)
                         break
@@ -44,7 +73,10 @@ class Insanity(discord.Client, Config):
                     await message.channel.send(cmd.ArgErr)
                     break
                 else:
-                    await cmd.handler(msg)
+                    if cmd.SendBase != None:
+                        await cmd.handler(self, msg)
+                    else:
+                        await cmd.handler(msg)
 
 try:
     inits = discord.Intents.all()
