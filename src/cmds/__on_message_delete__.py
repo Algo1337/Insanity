@@ -18,6 +18,7 @@ def append_to_logs(msg: str) -> bool:
         return False
     
 async def __on_message_delete__(base, message: DiscordUtils) -> bool:
+    print(f"{base.user}")
     local_tz = pytz.timezone('America/Kentucky/Louisville')
     timestamp = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
 
@@ -25,7 +26,7 @@ async def __on_message_delete__(base, message: DiscordUtils) -> bool:
 
     channel = discord.utils.get(message.Client.guild.text_channels, name = "logs")
     if channel:
-        await channel.send(embed = discord.Embed(title = f"Logs | Message Deleted", description = f"<@{message.Client.id}> has deleted their message!\nMessage:```{message.Client.content}```", colour = discord.Colour.red()))
+        await channel.send(embed = discord.Embed(title = f"Logs | Message Deleted", description = f"<@{message.Client.author.id}> has deleted their message!\n\nMessage:```{message.Client.content}```", colour = discord.Colour.red()))
                            
 
     if not append_to_logs(f"[ DELETED MESSAGE: {timestamp} ] {message.Client.id} | {message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id} | {message.Client.author.display_name}:{message.Client.author.name}: {message.Client.content}"):

@@ -7,21 +7,32 @@ def get_deleted_msgs(guild_id: int) -> str:
         return ""
     
     f = open("assets/deleted.log", "r")
-    lines = f.read().split("\n")
+    lines = f.read().split("\n")[::-1]
     data = []
+    count = 0
     for line in lines:
         if f"{guild_id}" in line:
             data.append(f"{line}\n")
+            count += 1
+
+        if count == 3:
+            break
         
     f.close()
     return data
 
 async def deleted(message: DiscordUtils) -> bool:
+    await message.Client.delete()
+
     data = get_deleted_msgs(message.Client.guild.id)
-    r = "\n".join(data)
-    if len(r) > 1999:
-        await message.send_message(r)
-        return True
+    embed = discord.Embed(title = "Deleted Messages", description = "The last deleted message: ", color = discord.Colour.red())
+    c = 0
+    for line in data:
+        embed.add_field(name = f"***Result #{c}***", value = f"```{data[c]}```", inline = False)
+        c += 1
     
-    await message.send_embed("Deleted Message", f"```{r}```", image = "https://media.discordapp.net/attachments/1400104223508533309/1400134712839770193/test.png?ex=688b8890&is=688a3710&hm=6e8c70c936bfbb7a6cbd9fb727e14d7a95d8b64d9be770a2d76044fc558a0c5e&=&format=webp&quality=lossless")
+    embed.set_author(name = "Insanity")
+    embed.set_footer(text = "https://insanity.host")
+
+    await message.Client.channel.send(embed = embed)
     return True

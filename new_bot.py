@@ -27,9 +27,15 @@ class Insanity(discord.Client, Config):
             if cmd.name == "__on_message_delete__":
                 self.OnMessageDelete = cmd
 
+    """
+        [ On Join ]
+    """
     async def on_join(self, vc):
         pass
 
+    """
+        [ On Message Delete ]
+    """
     async def on_message_delete(self, message):
         msg = DiscordUtils(self, message, Discord_Event_T.e_message_del)
         if self.OnMessageDelete:
