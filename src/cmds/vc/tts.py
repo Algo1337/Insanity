@@ -5,6 +5,7 @@ from gtts import gTTS
 from src.discord_utils import *
 
 async def tts(message: DiscordUtils) -> bool:
+    await message.Client.delete()
     if not message.Client.author.voice:
         await message.send_embed("TTS | Error", "You must be in a VC to use this!")
         return

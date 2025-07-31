@@ -5,31 +5,32 @@ import discord
 
 from src.discord_utils import *
 
-# Optional: Create an embed for invalid argument error
-embed = discord.Embed(title="Help", description = "Error, Invalid arguments\nType ;help for a list of commands")
-embed.set_author(name="Bot")
-embed.set_footer(text="Footer text here.")
-
-## Declare the amount of arguments for this command accepted
-## Since this is help, it doesn't need none upon execution
-__HELP_ARG_COUNT__ = 0
-
-## For Cmds with argument, A variable with the starting and ending prefix must be valid
-## Starting with '__', command name in all capital, and ending with '_INVALID_ARG_ERR__'
-## You can use a string or an embed (discord.Embed)
-__HELP_INVALID_ARG_ERR__ = embed
-
 async def help(message: DiscordUtils):
-    if len(message.Args) > 0 and message.Args[1] == "-fun":
-        await message.send_embed("Help", "working on it bub", {
-            "**Say**": ["```;say <text>```", True]
-        })
+    if len(message.Args) > 0:
+        if message.Args[1] == "-info":
+            await message.send_embed("Help", "List of info commands", {
+                "**My Info**": ["```>info --me```", False],
+                "**Server Info**": ["```>info --server```", False],
+                "**Permission Check**": ["```>info --perms```", False]
+            })
+        elif message.Args[1] == "-fun":
+            await message.send_embed("Help", "List of fun commands", {
+                "**Say**": ["```>say <text>```", False]
+            })
+        elif message.Args[1] == "-vc":
+            await message.send_embed("VC", "List of VC commands", {
+                "**Join VC**": ["```>join <vc>```", False],
+                "**TTS**": ["```>tts <?volume> <text>```", False],
+                "**TTS2**": ["```>tts2 <volume> <text>```", False],
+                "**Watch VC**": ["```>watchvc <vc>```", False]
+            })
+        # elif message.Args[1] == "-settings"
         return
 
     await message.send_embed("Help", "A list of categories of commands", {
-        "Info": "```;help -info",
-        "Fun": "```;help -fun```",
-        "VC": "```;help -vc```",
-        "Mod": "```;help -mod```",
-        "Settings": "```;help settings```"
+        "Info": "```>help -info```",
+        "Fun": "```>help -fun```",
+        "VC": "```>help -vc```",
+        "Mod": "```>help -mod```",
+        "Settings": "```>help settings```"
     })

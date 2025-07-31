@@ -16,10 +16,75 @@ __NUKE_ARG_COUNT__ = 2
 __NUKE_INVALID_ARG_ERR__ = discord.Embed(title = "Nuke | Error", description = "Invalid arguments provided", color = discord.Colour.red())
 __NUKE_INVALID_ARG_ERR__.add_field(name = "***Channel nuke***", value = "```>nuke --channel```", inline = False)
 __NUKE_INVALID_ARG_ERR__.add_field(name = "***Message nuke***", value = "```>nuke --msg <count>```", inline = False)
+__NUKE_INVALID_ARG_ERR__.add_field(name = "***Substring Included nuke***", value = "```>nuke --substring <string> <count>```", inline = False)
 __NUKE_INVALID_ARG_ERR__.add_field(name = "***User nuke***", value = "```>nuke --user <@tag> <?count(Default: 100)>```", inline = False)
-__NUKE_INVALID_ARG_ERR__.set_author(name = "Insanity")
+__NUKE_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
 __NUKE_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
 async def nuke(base, message: DiscordUtils) -> bool:
-    await message.send_embed("TEST", "TEST", image = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
+    await message.Client.delete()
+    opt = message.Args[1]
+
+    perms = message.Client.channel.permissions_for(message.Client.guild.me)
+    if not perms.manage_channels and message.Client.author.id not in base.Whitlist:
+        await message.send_embed("Nuke | Error", "You do not have the permissions to use this command!")
+    
+    if opt == "--channel":
+        old_channel = message.Client.channel
+        old_category = old_channel.category
+        old_position = old_channel.position
+
+        cloned_channel = await old_channel.clone(reason = "Channel reset")
+        await cloned_channel.edit(category = old_category, position = old_position, topic = f"{message.Client.guild.name} on TOP")
+
+        await old_channel.delete(reason = "reset")
+        await cloned_channel.send(f"Nuked")
+    elif opt == "--msg":
+        if message.Args[2].isdigit() == False:
+           await message.Client.channel.send(embed = __NUKE_INVALID_ARG_ERR__)
+           return False
+         
+        count = int(message.Args[2])
+        if count < 1000:
+            await message.Client.channel.purge(limit = count)
+        else:
+            async for msg in message.Client.channel.history(limit = count, oldest_first = False):
+                await msg.delete()
+                await asyncio.sleep(1/2)
+
+        await message.send_embed("Nuke", f"Successfully nuked {count} messages!")
+    elif opt == "--substring":
+        sub = " ".join(message.Args[2: len(message.Args) - 1])
+        count = message.Args[len(message.Args) - 1]
+
+        await message.Client.channel.send(sub)
+        if count.isdigit() == False:
+           await message.Client.channel.send(embed = __NUKE_INVALID_ARG_ERR__)
+        
+        count = int(count)
+        del_count = 0
+        async for msg in message.Client.channel.history(limit = count, oldest_first = False):
+            if sub in msg.content:
+                await msg.delete()
+                del_count += 1
+                await asyncio.sleep(1/2)
+
+        await message.send_embed("Nuke", f"Successfully nuked {del_count} messages containing ``{sub}``!")
+    elif opt == "--user":
+        user_id = message.Args[2].replace("<@", "").replace(">", "")
+        count = message.Args[len(message.Args) - 1]
+        if user_id.isdigit() == False or count.isdigit() == False:
+           await message.Client.channel.send(embed = __NUKE_INVALID_ARG_ERR__)
+        
+        user_id = int(user_id)
+        count = int(count)
+        del_count = 0
+        async for msg in message.Client.channel.history(limit = count, oldest_first = False):
+            if msg.author.id == user_id:
+                await msg.delete()
+                del_count += 1
+                await asyncio.sleep(1/2)
+
+        await message.send_embed("Nuke", f"Successfully nuked {del_count} of <@{user_id}>'s messages!")
+        
     return True
