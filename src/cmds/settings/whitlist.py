@@ -5,7 +5,7 @@ from src.discord_utils import *
 __WHITLIST_GET_BASE__ = True
 __WHITLIST_ARG_COUNT__ = 3
 __WHITLIST_INVALID_ARG_ERR__ = discord.Embed(title = "Whitlist | Error", description = "Invalid argument(s) provided!", color = discord.Colour.red())
-__WHITLIST_INVALID_ARG_ERR__.add_field(name = "***Whitlist User***", value = "```>whitlist <userid/@tag>```", inline = False)
+__WHITLIST_INVALID_ARG_ERR__.add_field(name = "***Whitlist User***", value = "```>whitlist <--add/rm> <userid/@tag>```", inline = False)
 __WHITLIST_INVALID_ARG_ERR__.set_image(url = "https://media.discordapp.net/attachments/1400104223508533309/1400134712839770193/test.png")
 __WHITLIST_INVALID_ARG_ERR__.set_author(name = "Insanity")
 __WHITLIST_INVALID_ARG_ERR__.set_footer(text = "https://insanity.host")

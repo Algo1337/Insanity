@@ -18,6 +18,7 @@ __NUKE_INVALID_ARG_ERR__.add_field(name = "***Channel nuke***", value = "```>nuk
 __NUKE_INVALID_ARG_ERR__.add_field(name = "***Message nuke***", value = "```>nuke --msg <count>```", inline = False)
 __NUKE_INVALID_ARG_ERR__.add_field(name = "***Substring Included nuke***", value = "```>nuke --substring <string> <count>```", inline = False)
 __NUKE_INVALID_ARG_ERR__.add_field(name = "***User nuke***", value = "```>nuke --user <@tag> <?count(Default: 100)>```", inline = False)
+__NUKE_INVALID_ARG_ERR__.set_thumbnail(url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
 __NUKE_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
 __NUKE_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
@@ -27,7 +28,7 @@ async def nuke(base, message: DiscordUtils) -> bool:
 
     perms = message.Client.channel.permissions_for(message.Client.guild.me)
     if not perms.manage_channels and message.Client.author.id not in base.Whitlist:
-        await message.send_embed("Nuke | Error", "You do not have the permissions to use this command!")
+        await message.send_embed("Nuke | Error", "You do not have the permissions to use this command!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     
     if opt == "--channel":
         old_channel = message.Client.channel
@@ -52,7 +53,7 @@ async def nuke(base, message: DiscordUtils) -> bool:
                 await msg.delete()
                 await asyncio.sleep(1/2)
 
-        await message.send_embed("Nuke", f"Successfully nuked {count} messages!")
+        await message.send_embed("Nuke", f"Successfully nuked {count} messages!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     elif opt == "--substring":
         sub = " ".join(message.Args[2: len(message.Args) - 1])
         count = message.Args[len(message.Args) - 1]
@@ -69,7 +70,7 @@ async def nuke(base, message: DiscordUtils) -> bool:
                 del_count += 1
                 await asyncio.sleep(1/2)
 
-        await message.send_embed("Nuke", f"Successfully nuked {del_count} messages containing ``{sub}``!")
+        await message.send_embed("Nuke", f"Successfully nuked {del_count} messages containing ``{sub}``!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     elif opt == "--user":
         user_id = message.Args[2].replace("<@", "").replace(">", "")
         count = message.Args[len(message.Args) - 1]
@@ -85,6 +86,6 @@ async def nuke(base, message: DiscordUtils) -> bool:
                 del_count += 1
                 await asyncio.sleep(1/2)
 
-        await message.send_embed("Nuke", f"Successfully nuked {del_count} of <@{user_id}>'s messages!")
+        await message.send_embed("Nuke", f"Successfully nuked {del_count} of <@{user_id}>'s messages!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         
     return True

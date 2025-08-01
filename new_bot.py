@@ -9,6 +9,10 @@ class Insanity(discord.Client, Config):
     OnMessage:          Cog
     OnMessageDelete:    Cog
     Whitlist:           list[int] = []
+    Blacklistjoin:      dict[int, int] = {}
+    WatchingVC:         bool = False
+    CurrentRegion:      str = ""
+    LastRegion:         str = ""
     async def on_ready(self):
         self.Cmds = []
         self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)
@@ -30,8 +34,15 @@ class Insanity(discord.Client, Config):
     """
         [ On Join ]
     """
-    async def on_join(self, vc):
-        pass
+    async def on_guild_join(self, member):
+        if member.guild.id not in self.Blacklistjoin:
+            return
+        
+        if member.id in self.Blacklistjoin[member.guild.id]:
+            member.kick()
+            chan = await self.get_channel(member.guild.text_channels, name = "logs")
+            chan.send(f"{member.name} tried joining but is blacklisted!")
+
 
     """
         [ On Message Delete ]
@@ -71,7 +82,7 @@ class Insanity(discord.Client, Config):
                 break
 
             if f"{Config.PREFIX}{cmd.name}" == msg.Cmd:
-                if cmd.ArgCount > 0 and len(msg.Args) < cmd.ArgCount:
+                if cmd.ArgCount > 0 and msg.Args.__len__() < cmd.ArgCount:
                     if isinstance(cmd.ArgErr, discord.Embed):
                         await message.channel.send(embed = cmd.ArgErr)
                         break

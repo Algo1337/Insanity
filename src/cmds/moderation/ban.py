@@ -34,5 +34,5 @@ async def ban(base, message: DiscordUtils) -> bool:
         reason = " ".join(message.Args[2:])
     
     await message.Client.guild.ban(userobj, reason = reason)
-    await message.send_embed("Ban", f"User <@{userobj.id}> successfully banned for:\n\n```{reason}```", image = "https://media.discordapp.net/attachments/1400104223508533309/1400134712839770193/test.png?ex=688b8890&is=688a3710&hm=6e8c70c936bfbb7a6cbd9fb727e14d7a95d8b64d9be770a2d76044fc558a0c5e&=&format=webp&quality=lossless")
+    await message.send_embed("Ban", f"User <@{userobj.id}> successfully banned for:\n\n```{reason}```", image = "https://media.discordapp.net/attachments/1400104223508533309/1400134712839770193/test.png?ex=688b8890&is=688a3710&hm=6e8c70c936bfbb7a6cbd9fb727e14d7a95d8b64d9be770a2d76044fc558a0c5e&=&format=webp&quality=lossless", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     return True

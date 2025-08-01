@@ -16,19 +16,20 @@ async def join(base, message: DiscordUtils) -> bool:
 
     if join_query == "--me":
         if message.Client.guild.voice_client and message.Client.guild.voice_client.channel.id != message.Client.author.voice.channel.id:
-            await message.send_embed("Join", f"Leaving VC: ``{message.Client.guild.voice_client.channel.name}`` for the VC your in!")
+            await message.send_embed("Join", f"Leaving VC: ``{message.Client.guild.voice_client.channel.name}`` for the VC your in!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
             await message.Client.guild.voice_client.disconnect()
         
         vc = await message.Client.author.voice.channel.connect()
         await vc.guild.me.edit(mute=True, deafen=True)
-        await message.send_embed("Join", f"Successfully joined ``{message.Client.author.voice.channel.name}``")
+        await message.send_embed("Join", f"Successfully joined ``{message.Client.author.voice.channel.name}``", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         return True
 
     if not join_query.isdigit():
         return False
+
     
     chan_obj = base.get_channel(int(join_query))
     vc = await chan_obj.connect()
     await vc.guild.me.edit(mute=True, deafen=True)
-    await message.send_embed("Join", f"Successfully joined ``{chan_obj.name}``")
+    await message.send_embed("Join", f"Successfully joined ``{chan_obj.name}``", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     return True

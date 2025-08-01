@@ -35,7 +35,7 @@ class DiscordUtils():
             return False
         
         try:
-            resp_len = len(text)
+            resp_len = text.__len__()
             if resp_len > 1999:
                 c = resp_len / 1999
                 current = 0
@@ -54,7 +54,7 @@ class DiscordUtils():
         
         return False
     
-    async def send_embed(self, title: str, desc: str, fields: dict = None, image: str = None, images: list[str] = None) -> bool:
+    async def send_embed(self, title: str, desc: str, fields: dict = None, author_name: str = None, author_url: str = None, image: str = None, images: list[str] = None) -> bool:
         embed = discord.Embed(title = title, description = desc, color = discord.Colour.red())
 
         if image != None:
@@ -67,6 +67,16 @@ class DiscordUtils():
                 else:
                     embed.add_field(name = field, value = fields[field], inline = False)
 
+        if author_name != None and author_url != None:
+            embed.set_author(name = author_name, icon_url = author_url)
+        elif author_name != None:
+            embed.set_author(name = author_name)
+        elif author_url != None:
+            embed.set_author(icon_url = author_url)
+
+        if author_url != None:
+            embed.set_thumbnail(url = author_url)
+
         await self.Client.channel.send(embed = embed)
 
     def get_emojis(self) -> list:
@@ -77,10 +87,10 @@ class DiscordUtils():
                 emoji_args = arg.split(":")
 
                 ## <:emoji_name:emoji_id>
-                if len(emoji_args) == 3:
+                if emoji_args.__len__() == 3:
                     emojis.append(emoji_args[2][:-1])
                     continue
-                elif len(emoji_args) == 2:
+                elif emoji_args.__len__() == 2:
                     emojis.append(emoji_args[1][:-1])
                     continue
 
