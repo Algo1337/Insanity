@@ -38,10 +38,11 @@ class Insanity(discord.Client, Config):
         if member.guild.id not in self.Blacklistjoin:
             return
         
-        if member.id in self.Blacklistjoin[member.guild.id]:
-            member.kick()
-            chan = await self.get_channel(member.guild.text_channels, name = "logs")
-            chan.send(f"{member.name} tried joining but is blacklisted!")
+        if member.guild.id in self.Blacklistjoin:
+            if member.id in self.Blacklistjoin[member.guild.id]:
+                member.kick()
+                chan = await self.get_channel(member.guild.text_channels, name = "logs")
+                chan.send(f"{member.name} tried joining but is blacklisted!")
 
 
     """

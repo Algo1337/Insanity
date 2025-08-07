@@ -33,10 +33,7 @@ async def tts(base, message: DiscordUtils) -> bool:
         text = text.replace(f"{message.Args[1]} ", "")
 
     if message.Args[len(message.Args) - 2].startswith("--repeat="):
-        text = text.replace(f"{message.Args[len(message.Args) - 2]} ", "")
-
-    if message.Args[len(message.Args) - 1] == "--q":
-        text = text.replace("--q", "")
+        text = text.replace(f"{message.Args[len(message.Args) - 2]} ", "").replace("--q", "").replace(f"{message.Args[len(message.Args) - 2]} ", "")
 
     tts = gTTS(text, lang="en", tld="co.uk")
     name = random.randint(0, 99999)
