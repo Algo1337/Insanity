@@ -37,7 +37,7 @@ async def help(message: DiscordUtils):
         elif message.Args[1] == "-settings":
             await message.send_embed("Settings", "List of setting(s) commands\n\nThese commands are for whitlisted users only!\n\nKeep in mind: ``?`` stands for optional argument", {
                 "**Watch VC**": "```>watchvc```",
-                "**Stop Watch": "```>stopwatch",
+                "**Stop Watch**": "```>stopwatch```",
                 "**Switch VC Region**": "```>switch```",
                 "**Whitlist user**": "```>whitlist```",
             }, author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")

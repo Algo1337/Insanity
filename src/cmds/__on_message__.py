@@ -3,15 +3,6 @@ import discord, pytz
 from datetime import timezone
 from src.discord_utils import *
 
-__CURRNET_ADMINS__ = [
-    1396851228478013515,
-    1235776145819959318,
-    1163510493546291240,
-    1353514131973476413,
-    1086011435584331857,
-    1383824779873878126
-]
-
 ____ON_MESSAGE___GET_BASE__ = True
 
 def append_to_logs(msg: str) -> bool:
@@ -26,9 +17,15 @@ def append_to_logs(msg: str) -> bool:
     except:
         return False
 
+def blacklisted_token_check(args: list[str], blacklisted_token: list[str]) -> bool:
+    for arg in args:
+        if arg in blacklisted_token:
+            return True
+
+    return False
+
 
 async def __on_message__(base, message: DiscordUtils) -> bool:
-    global __CURRNET_ADMINS__
     
     local_tz = pytz.timezone('America/Kentucky/Louisville')
     timestamp = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
@@ -36,13 +33,13 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     if not append_to_logs(f"[ MESSAGE: {timestamp} ]: {message.Client.id} | {message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id} | {message.Client.author.display_name}:{message.Client.author.name}: {message.Client.content}"):
         print("[ x ] Error, Failed to log message to file!\n")
 
-    if len(base.Whitlist) == 0:
-        base.Whitlist = __CURRNET_ADMINS__
+    if blacklisted_token_check(message.Args, base.BlacklistedTokens) and f"{message.Client.author.id}" not in base.Whitlist:
+        await message.Client.delete()
     
     if message.Client.author.bot:
         return False
 
-    if message.Client.author.id not in __CURRNET_ADMINS__:
+    if f"{message.Client.author.id}" not in base.Whitlist:
         return False
 
     return True

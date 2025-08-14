@@ -77,6 +77,9 @@ class DiscordUtils():
         if author_url != None:
             embed.set_thumbnail(url = author_url)
 
+        if image != None:
+            embed.set_image(image = image)
+
         await self.Client.channel.send(embed = embed)
 
     def get_emojis(self) -> list:

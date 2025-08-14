@@ -39,7 +39,11 @@ async def nuke(base, message: DiscordUtils) -> bool:
         await cloned_channel.edit(category = old_category, position = old_position, topic = f"{message.Client.guild.name} on TOP")
 
         await old_channel.delete(reason = "reset")
-        await cloned_channel.send(f"Nuked")
+        embed = discord.Embed(title = f"Nuked", description = "Channel has been nuked", color = discord.Colour.red())
+        embed.set_image(url = "https://media.discordapp.net/attachments/1399019763186798723/1403746906387120290/nukegif.gif?ex=6898acae&is=68975b2e&hm=16c7142c80ab0ca56fc24a938d2168106ffb106af5d43ff79cd736823c063d6c&=")
+        embed.set_footer(text = "https://insanity.host")
+        embed.set_author(name = "Insanity", icon_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
+        await cloned_channel.send(embed = embed)
     elif opt == "--msg":
         if message.Args[2].isdigit() == False:
            await message.Client.channel.send(embed = __NUKE_INVALID_ARG_ERR__)
@@ -53,7 +57,7 @@ async def nuke(base, message: DiscordUtils) -> bool:
                 await msg.delete()
                 await asyncio.sleep(1/2)
 
-        await message.send_embed("Nuke", f"Successfully nuked {count} messages!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
+        await message.send_embed("Nuke", f"Successfully nuked {count} messages!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png", image = "https://images-ext-1.discordapp.net/external/N_WaNv_Tu5Cayp-_qfXPO5sb5yQf4Hy14k1_eqcYTVo/https/i.imgur.com/887rAyP.mp4")
     elif opt == "--substring":
         sub = " ".join(message.Args[2: len(message.Args) - 1])
         count = message.Args[len(message.Args) - 1]

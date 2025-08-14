@@ -8,14 +8,19 @@ class Insanity(discord.Client, Config):
     Commands:           list[Cog] = []
     OnMessage:          Cog
     OnMessageDelete:    Cog
+    OnJoin:             Cog
     Whitlist:           list[int] = []
     Blacklistjoin:      dict[int, int] = {}
+    BlacklistedTokens:  list[str] = []
     WatchingVC:         bool = False
     CurrentRegion:      str = ""
     LastRegion:         str = ""
     async def on_ready(self):
         self.Cmds = []
         self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)
+        self.BlacklistedTokens = Config.get_blacklisted_tokens()
+        self.Whitlist = Config.get_admins_list()
+        self.Blacklistjoin = Config.get_blacklistjoin_list()
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity API Streaming", url = "https://insanity.bot")
@@ -31,18 +36,22 @@ class Insanity(discord.Client, Config):
             if cmd.name == "__on_message_delete__":
                 self.OnMessageDelete = cmd
 
+            if cmd.name == "__on_join__":
+                self.OnJoin = cmd
+
     """
         [ On Join ]
     """
     async def on_guild_join(self, member):
-        if member.guild.id not in self.Blacklistjoin:
-            return
-        
-        if member.guild.id in self.Blacklistjoin:
-            if member.id in self.Blacklistjoin[member.guild.id]:
-                member.kick()
-                chan = await self.get_channel(member.guild.text_channels, name = "logs")
-                chan.send(f"{member.name} tried joining but is blacklisted!")
+        msg = DiscordUtils(self, message, Discord_Event_T.e_joined)
+        if self.OnMessageDelete:
+            if self.OnMessageDelete.SendBase:
+                if (await self.OnMessageDelete.handler(self, msg)) == False:
+                    return
+                
+            else:
+                if (await self.OnMessageDelete.handler(msg)) == False:
+                    return
 
 
     """
@@ -96,12 +105,19 @@ class Insanity(discord.Client, Config):
                     else:
                         await cmd.handler(msg)
 
-try:
-    inits = discord.Intents.all()
-    inits.message_content = True
+inits = discord.Intents.all()
+inits.message_content = True
 
-    bot = Insanity(intents = inits, Config = Config())
-    bot.run(Config.get_token())
-except:
-    print(f"\x1b[31m[ - ]\x1b[0m Exiting....!")
-    exit(0)
+bot = Insanity(intents = inits, Config = Config())
+bot.run(Config.get_token())
+
+#try:
+#    inits = discord.Intents.all()
+#    inits.message_content = True
+#
+#    bot = Insanity(intents = inits, Config = Config())
+#    bot.run(Config.get_token())
+#except:
+#    print(f"\x1b[31m[ - ]\x1b[0m Exiting....!")
+#    exit(0)
+

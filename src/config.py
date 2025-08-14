@@ -77,10 +77,10 @@ class Config:
             }
         }
     """
-    Commands = {
-
-    }
-
+    Commands: dict = {}
+    BLACKLIST_JOIN_PATH: str = "assets/blacklist_join.log"
+    BLACKLISTED_TOKENS_PATH: str = "assets/blacklisted_token.log"
+    ADMINS_PATH: str = "assets/admins.log"
     def get_token() -> str:
         f = open("token.cfg", "r")
         t = f.read()
@@ -123,6 +123,7 @@ class Config:
         
         return {}
     
+    @staticmethod
     def load_object_from_file(name: str, path: str, object_name):
         spec = importlib.util.spec_from_file_location(name, path)
         module = importlib.util.module_from_spec(spec)
@@ -130,3 +131,52 @@ class Config:
 
         return module
         # return getattr(module, object_name)
+
+    @staticmethod
+    def get_blacklistjoin_list() -> list[str]:
+        f = open(Config.BLACKLIST_JOIN_PATH, "r")
+        ids = f.read().split("\n")
+
+        f.close()
+        return ids
+
+    @staticmethod
+    def add_blacklistjoin(user_id: int) -> bool:
+        f = open(Config.BLACKLIST_JOIN_PATH, "a")
+        f.write(f"{user_id}\n")
+
+        f.close()
+        return True
+
+    @staticmethod
+    def get_blacklisted_tokens() -> list[str]:
+        f = open(Config.BLACKLISTED_TOKENS_PATH, "r")
+        ids = f.read().split("\n")
+
+        f.close()
+        return ids
+
+    @staticmethod
+    def add_blacklisted_tokens(token: str) -> bool:
+        f = open(Config.BLACKLISTED_TOKENS_PATH, "a")
+        f.write(f"{token}\n")
+
+        f.close()
+        return True
+
+    @staticmethod
+    def get_admins_list() -> list[str]:
+        f = open(Config.ADMINS_PATH, "r")
+        ids = f.read().split("\n")
+        print(ids)
+
+        f.close()
+        return ids
+
+    @staticmethod
+    def add_admins_list(uid: int) -> bool:
+        f = open(Config.ADMINS_PATH, "a")
+        f.write(f"{uid}\n")
+
+        f.close()
+        return True
