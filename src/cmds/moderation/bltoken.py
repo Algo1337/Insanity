@@ -16,6 +16,14 @@ async def bltoken(base, message: DiscordUtils) -> bool:
     opt = message.Args[1]
     token = message.Args[2]
 
+    if opt == "--view":
+        tokens = ""
+        for token in base.BlacklistedTokens:
+            tokens += f"{token}\n"
+
+        await message.send_embed("Blacklisted Tokens", f"```{tokens}```")
+        return
+
     if opt == "--add":
         base.BlacklistedTokens.append(token)
         Config.add_blacklisted_tokens(token)

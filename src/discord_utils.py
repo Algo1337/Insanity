@@ -71,8 +71,6 @@ class DiscordUtils():
             embed.set_author(name = author_name, icon_url = author_url)
         elif author_name != None:
             embed.set_author(name = author_name)
-        elif author_url != None:
-            embed.set_author(icon_url = author_url)
 
         if author_url != None:
             embed.set_thumbnail(url = author_url)
