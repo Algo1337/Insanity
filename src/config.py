@@ -168,7 +168,6 @@ class Config:
     def get_admins_list() -> list[str]:
         f = open(Config.ADMINS_PATH, "r")
         ids = f.read().split("\n")
-        print(ids)
 
         f.close()
         return ids

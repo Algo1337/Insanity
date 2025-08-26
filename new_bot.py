@@ -25,6 +25,7 @@ class Insanity(discord.Client, Config):
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity API Streaming", url = "https://insanity.bot")
         )
+        
         print(f"[ + ] Firing up {self.user}....!")
 
         for cmd in self.Cmds:
