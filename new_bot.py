@@ -19,13 +19,14 @@ class Insanity(discord.Client, Config):
         self.Cmds = []
         self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)
         self.BlacklistedTokens = Config.get_blacklisted_tokens()
+        self.BlacklistedTokens.pop(len(self.BlacklistedTokens) - 1)
         self.Whitlist = Config.get_admins_list()
         self.Blacklistjoin = Config.get_blacklistjoin_list()
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity API Streaming", url = "https://insanity.bot")
         )
-        
+
         print(f"[ + ] Firing up {self.user}....!")
 
         for cmd in self.Cmds:
@@ -44,7 +45,7 @@ class Insanity(discord.Client, Config):
         [ On Join ]
     """
     async def on_guild_join(self, member):
-        msg = DiscordUtils(self, message, Discord_Event_T.e_joined)
+        msg = DiscordUtils(self, member, Discord_Event_T.e_joined)
         if self.OnMessageDelete:
             if self.OnMessageDelete.SendBase:
                 if (await self.OnMessageDelete.handler(self, msg)) == False:
@@ -111,14 +112,3 @@ inits.message_content = True
 
 bot = Insanity(intents = inits, Config = Config())
 bot.run(Config.get_token())
-
-#try:
-#    inits = discord.Intents.all()
-#    inits.message_content = True
-#
-#    bot = Insanity(intents = inits, Config = Config())
-#    bot.run(Config.get_token())
-#except:
-#    print(f"\x1b[31m[ - ]\x1b[0m Exiting....!")
-#    exit(0)
-

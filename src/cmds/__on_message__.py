@@ -20,6 +20,7 @@ def append_to_logs(msg: str) -> bool:
 def blacklisted_token_check(msg: str, blacklisted_token: list[str]) -> bool:
     for token in blacklisted_token:
         if token in msg:
+            print(token)
             return True
 
     return False
@@ -35,7 +36,9 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     if message.Client.author.bot:
         return False
     
-    if blacklisted_token_check(message.Data, base.BlacklistedTokens) and f"{message.Client.author.id}" not in base.Whitlist:
+    gay = blacklisted_token_check(message.Data, base.BlacklistedTokens)
+    if  gay and f"{message.Client.author.id}" not in base.Whitlist:
+        print(gay)
         await message.Client.delete()
 
     if f"{message.Client.author.id}" not in base.Whitlist:
