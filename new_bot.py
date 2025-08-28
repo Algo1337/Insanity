@@ -15,6 +15,21 @@ class Insanity(discord.Client, Config):
     WatchingVC:         bool = False
     CurrentRegion:      str = ""
     LastRegion:         str = ""
+    AVAILABLE_REGIONS:  list[str] = [
+        'us-west', 
+        'us-east', 
+        'us-central', 
+        'us-south'
+        'singapore', 
+        'japan', 
+        'hongkong', 
+        'brazil',
+        'sydney', 
+        'southafrica', 
+        'india'
+        # 'rotterdam'
+    ]
+
     async def on_ready(self):
         self.Cmds = []
         self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)

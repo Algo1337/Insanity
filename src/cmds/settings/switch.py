@@ -10,43 +10,26 @@ __SWITCH_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://ima
 __SWITCH_INVALID_ARG_ERR__.set_thumbnail(url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
 __SWITCH_INVALID_ARG_ERR__.set_footer(text = "http://insanity.host")
 
-AVAILABLE_REGIONS = [
-    'us-west', 
-    'us-east', 
-    'us-central', 
-    'us-south'
-    'singapore', 
-    'japan', 
-    'hongkong', 
-    'brazil',
-    'sydney', 
-    'southafrica', 
-    'india'
-    # 'rotterdam'
-]
-
 async def switch(base, message: DiscordUtils) -> bool:
-    global AVAILABLE_REGIONS
-
     await message.Client.delete()
     opt = message.Args[1].replace("<@", "").replace(">", "")
 
     if opt == "--vc":
         channel = message.Client.author.voice.channel
-        region = AVAILABLE_REGIONS[random.randint(0, len(AVAILABLE_REGIONS) - 1)]
+        region = base.AVAILABLE_REGIONS[random.randint(0, len(base.AVAILABLE_REGIONS) - 1)]
         if region == base.CurrentRegion or region == base.LastRegion:
             while region != base.CurrentRegion and region != base.LastRegion:
-                region = AVAILABLE_REGIONS[random.randint(0, len(AVAILABLE_REGIONS) - 1)]
+                region = base.AVAILABLE_REGIONS[random.randint(0, len(base.AVAILABLE_REGIONS) - 1)]
 
         await channel.edit(rtc_region = region)
         await message.send_embed("Switch Region VC", f"Successfully changed <#{channel.id}> region to ``{region}``", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     elif opt.isdigit():
         channel_id = int(opt)
         channel = discord.utils.get(message.Client.guild.channels, id = channel_id)
-        region = AVAILABLE_REGIONS[random.randint(0, len(AVAILABLE_REGIONS) - 1)]
+        region = base.AVAILABLE_REGIONS[random.randint(0, len(base.AVAILABLE_REGIONS) - 1)]
         if region == base.CurrentRegion or region == base.LastRegion:
             while region != base.CurrentRegion and region != base.LastRegion:
-                region = AVAILABLE_REGIONS[random.randint(0, len(AVAILABLE_REGIONS) - 1)]
+                region = base.AVAILABLE_REGIONS[random.randint(0, len(base.AVAILABLE_REGIONS) - 1)]
 
         await channel.edit(rtc_region = region)
         await message.send_embed("Switch Region VC", f"Successfully changed <#{channel.id}> region to ``{region}``", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
