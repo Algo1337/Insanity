@@ -17,7 +17,7 @@ async def watchvc(base, message: DiscordUtils) -> bool:
     await message.Client.delete()
     opt = message.Args[1]
 
-    vc = None
+    vc: discord.VoiceClient = None
     chan = None
     if opt == "--me":
         vc = await message.Client.author.voice.channel.connect()
@@ -27,16 +27,21 @@ async def watchvc(base, message: DiscordUtils) -> bool:
         vc = base.get_channel(vcid)
         vc = await vc.connect()
 
+    if vc.channel.rtc_region:
+        base.CurrentRegion = vc.channel.rtc_region
+
+    await message.send_embed("VC Watch", f"Joined <#{vc.channel.id}>, Watching for >= 300.00ms or higher latency!")
     base.WatchingVC = True
     while base.WatchingVC != False:
         latency = vc.latency * 1000
-        print(f"Watching VC: {latency} | {vc.latency}")
+        print(f"Watching VC: {latency} | Current Region {base.CurrentRegion}")
         if latency > 300.00 and f"{latency}" != "inf":
             region = base.AVAILABLE_REGIONS[random.randint(0, (len(base.AVAILABLE_REGIONS) - 1))]
             if region == base.LastRegion or region == base.CurrentRegion:
                 while region != base.LastRegion and region != base.CurrentRegion:
                     region = base.AVAILABLE_REGIONS[random.randint(0, (len(base.AVAILABLE_REGIONS) - 1))]
 
+                base.CurrentRegion = region
             await vc.channel.edit(rtc_region = region)
             await message.send_embed("Watch VC", f"High latency detected, Switching VC region to ``{region}``....!\n")
 

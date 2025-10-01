@@ -36,10 +36,10 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     if message.Client.author.bot:
         return False
     
-    gay = blacklisted_token_check(message.Data, base.BlacklistedTokens)
-    if  gay and f"{message.Client.author.id}" not in base.Whitlist:
-        print(gay)
-        await message.Client.delete()
+    # gay = blacklisted_token_check(message.Data, base.BlacklistedTokens)
+    # if  gay and f"{message.Client.author.id}" not in base.Whitlist:
+    #     print(gay)
+    #     await message.Client.delete()
 
     if f"{message.Client.author.id}" not in base.Whitlist:
         return False
