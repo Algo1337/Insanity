@@ -20,7 +20,7 @@ Create ``token.cfg`` and add your bot token in it
 
 All Commands are in ``/src/cmds/``
 
-### New Command Directory
+### New Commands(s) Directory
 
 If you decicde to change directory; edit line #35 in ``new_bot.py`` 
 
