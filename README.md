@@ -20,8 +20,5 @@ Create ``token.cfg`` and add your bot token in it
 
 All Commands are in ``/src/cmds/``
 
-If you decicde to change directory; edit line #35 in ``new_bot.py`` (Here)[https://github.com/Algo1337/Insanity/blob/8e3f6a35f7cd880c42256b2bc985d56ac8aeb959/new_bot.py#L35]
-
-```python
-self.Commands = Config.retrieve_all_commands("/src/cmds", 0, self.Cmds)
-```
+If you decicde to change directory; edit line #35 in ``new_bot.py`` 
+[https://github.com/Algo1337/Insanity/blob/8e3f6a35f7cd880c42256b2bc985d56ac8aeb959/new_bot.py#L35]
