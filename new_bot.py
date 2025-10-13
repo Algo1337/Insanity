@@ -69,7 +69,14 @@ class Insanity(discord.Client, Config):
             else:
                 if (await self.OnMessageDelete.handler(msg)) == False:
                     return
-
+                
+    async def vcmove(ctx, member: discord.Member, *, channel: discord.VoiceChannel):
+        """Move a member to another voice channel."""
+        if member.voice:
+            await member.move_to(channel)
+            await ctx.send(f"Moved {member.display_name} to {channel.name}.")
+        else:
+            await ctx.send(f"{member.display_name} is not in a voice channel.")
 
     """
         [ On Message Delete ]

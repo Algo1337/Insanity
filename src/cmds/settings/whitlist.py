@@ -1,5 +1,6 @@
 import discord
 
+from src.config import *
 from src.discord_utils import *
 
 __WHITLIST_GET_BASE__ = True

