@@ -1,15 +1,59 @@
-import os, importlib
+import os, importlib, enum
+
+class op_t(enum.Enum):
+    __read_db__ = "read"
+    __add_id__ = "add"
+    __rm_id__ = "rm"
+
+class db_t(enum.Enum):
+    __SKIDS_PATH__              : str = "assets/skids.log"
+    __BLACKLIST_JOIN_PATH__     : str = "assets/blacklist_join.log"
+    __BLACKLISTED_TOKENS_PATH__ : str = "assets/blacklisted_token.log"
+    __ADMINS_PATH__             : str = "assets/admins.log"
+
+def database(db: db_t, op: op_t, query: int | str) -> bool | str:
+    if op == op_t.__read_db__:
+        """ Read Database """
+        file = open(db, "r")
+        data = file.read().split("\n")
+        file.close()
+
+        return data
+    elif op == op_t.__add_id__:
+        """ Add Query to File """
+        file = open(db, "a")
+        file.write(f"{query}\n")
+        file.close()
+
+        return True
+    elif op == op_t.__rm_id__:
+        """ Remove Query from file """
+        new_db = ""
+        file = open(db, "r")
+        data = file.read().split("\n")
+        for line in data:
+            if query not in line:
+                new_db = f"{data}\n"
+
+        file.close()
+        file = open(db, "w")
+        file.write(new_db)
+        file.close()
+
+        return True
+    
+    return False
 
 class Cog:
-    name: str           = ""
-    cmd: str            = ""
-    invalid_args_err    = ""
-    lib: None
-    handler: None
-    ArgCount: int       = 0
-    ArgErr: str         = ""
-    SendBase: int       = 0
-    filepath: str       = ""
+    name                : str = ""
+    cmd                 : str = ""
+    invalid_args_err    : str = ""
+    lib                 : None
+    handler             : None
+    ArgCount            : int = 0
+    ArgErr              : str = ""
+    SendBase            : int = 0
+    filepath            : str = ""
     def __init__(self, name: str, cmd: str, lib, filepath: str, invalid_args_err: str = ""):
         self.name = name
         self.cmd = cmd
@@ -29,64 +73,15 @@ class Cog:
         self.filepath = filepath
         self.invalid_args_err = invalid_args_err
 
-
-
 class Config:
     PREFIX = ">"
-
-    """
-        { "ServerID": {
-                "THRESHOLD": 200,
-                "LastRegion": "us-east",
-                "CurrentRegion": "us-west",
-                "VC": "voice_channel_id"
-            }
-        }
-    """
-    VC_WATCH = {}
-
-    """ 
-        { ServerID: "VC" }
-    """
-    MUSIC_PLAYING = {}
-
-    """
-        Available regions, Some server do not accept all
-    """
-    AVAILABLE_REGIONS = [
-        'us-west', 
-        'us-east', 
-        'us-central', 
-        'us-south'
-        'singapore', 
-        'japan', 
-        'hongkong', 
-        'brazil',
-        'sydney', 
-        'southafrica', 
-        'india', 
-        'rotterdam'
-    ]
-
-    """
-        { "help" { 
-                "args": 0,
-                "on_err": "",
-                "invalid_args": ""
-                "fn": void
-            }
-        }
-    """
-    Commands: dict = {}
-    BLACKLIST_JOIN_PATH: str = "assets/blacklist_join.log"
-    BLACKLISTED_TOKENS_PATH: str = "assets/blacklisted_token.log"
-    ADMINS_PATH: str = "assets/admins.log"
     def get_token() -> str:
-        f = open("token.cfg", "r")
+        f = open("/cfg/token.cfg", "r")
         t = f.read()
         f.close()
 
         return t
+    
     """
         {
             "file": "filepath"
@@ -131,51 +126,3 @@ class Config:
 
         return module
         # return getattr(module, object_name)
-
-    @staticmethod
-    def get_blacklistjoin_list() -> list[str]:
-        f = open(Config.BLACKLIST_JOIN_PATH, "r")
-        ids = f.read().split("\n")
-
-        f.close()
-        return ids
-
-    @staticmethod
-    def add_blacklistjoin(user_id: int) -> bool:
-        f = open(Config.BLACKLIST_JOIN_PATH, "a")
-        f.write(f"{user_id}\n")
-
-        f.close()
-        return True
-
-    @staticmethod
-    def get_blacklisted_tokens() -> list[str]:
-        f = open(Config.BLACKLISTED_TOKENS_PATH, "r")
-        ids = f.read().split("\n")
-
-        f.close()
-        return ids
-
-    @staticmethod
-    def add_blacklisted_tokens(token: str) -> bool:
-        f = open(Config.BLACKLISTED_TOKENS_PATH, "a")
-        f.write(f"{token}\n")
-
-        f.close()
-        return True
-
-    @staticmethod
-    def get_admins_list() -> list[str]:
-        f = open(Config.ADMINS_PATH, "r")
-        ids = f.read().split("\n")
-
-        f.close()
-        return ids
-
-    @staticmethod
-    def add_admins_list(uid: int) -> bool:
-        f = open(Config.ADMINS_PATH, "a")
-        f.write(f"{uid}\n")
-
-        f.close()
-        return True

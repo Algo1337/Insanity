@@ -18,8 +18,8 @@ class DiscordUtils():
     def __init__(self, dClient, message, event_t: Discord_Event_T):    
         self.dClient = dClient
         self.Client_T = event_t
+        self.Client = message
         if event_t == Discord_Event_T.e_message or event_t == Discord_Event_T.e_message_del:
-            self.Client = message
             self.Data = message.content
             self.dClient = dClient
             self.Client_T = event_t
@@ -29,6 +29,19 @@ class DiscordUtils():
             else:
                 self.Args = []
                 self.Cmd = self.Data
+
+    def get_arg(self, pos: int) -> str:
+        return self.Args[pos]
+    
+    def get_flag_value(self, flag: str) -> str | None:
+        i = 0
+        for arg in self.Args:
+            if arg == flag:
+                return self.Args[i + 1]
+            
+            i += 1
+
+        return None
 
     async def send_message(self, text: str, file = None, files = None) -> bool:
         if not text or text == "":
