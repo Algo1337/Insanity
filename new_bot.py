@@ -1,82 +1,28 @@
 import discord
 
+# from tkinker import tk
+
 from src.config import *
 from src.discord_utils import *
 
 COMMANDS_DIR = "/src/cmds"
 
-class Cursor:
-    x       : int = 0   # X Cursor
-    y       : int = 0   # Y Cursor
-    def __init__(self):
-        self.x = 1
-        self.y = 1
+# class Notifications:
+#     gui: tk.Tk
+#     def __init__(self):
+#         self.root = tk.Tk()
+#         self.root.overrideredirect(True)
+#         self.root.geometry(f"400x200+10+10")
+#         self.root.configure(bg="black")
+#         self.root.attributes("-topmost", True)
+#         self.root.attributes("-alpha", 1.0)
 
-class TuiDisplay:
-    def display_component() -> None:
-        # Create Border
-        pass
+#         self.root.bind("<Escape>", lambda e: self.root.destroy())
 
-    def fill_component() -> None:
-        # fill color
-        pass
-
-class TuiComponent(TuiDisplay):
-    width           : int = 0   # Box Width
-    height          : int = 0   # Height
-    cursor          : Cursor    # Current Position
-    buffer          : str = ""  # Buffer
-
-    display_start   : int = 0
-    def __init__(self, w: int, h: int, start: int):
-        self.width = w 
-        self.height = h
-        self.display_start = start
-        self.cursor = Cursor()
-        
-        print(f"\033[0;{self.display_start - 1}f", end = "", flush = True)
-
-        # Set Top Border
-        for c in range(0, self.width): print("-", end = "", flush = True)
-
-        # Set Side Border and Bottom Border
-        for i in range(2, self.height):
-            print(f"\033[{i};{self.display_start - 1}f", end = "", flush = True)
-            
-            print("|", end = "", flush = True)
-            for c in range(0, self.width - 2): print(" ", end = "", flush = True)
-            print("|", end = "\n", flush = True)
-
-
-        print(f"\033[{self.height};{self.display_start}f", end = "", flush = True)
-        for c in range(1, self.width): print("-", end = "", flush = True)
-
-    def print(self, data: str, flush: bool = False) -> bool:
-        if len(data) > self.width - 2: # - 2 for box borders
-            pass # Split text every self.width-length
-
-        self.buffer += data
-
-        if flush:
-            for line in self.buffer.split("\n"):
-                print(f"\033[{i};{self.display_start}f", end = "", flush = True)
-                print(line, flush = True)
-
-            self.buffer = ""
-
-class tui_logger:
-    # Terminal Settings
-    Size        : int = 0
-
-    # Components
-    __BOT_BOX__ : TuiComponent = None
-    __LOG_BOX__ : TuiComponent = None
-    def __init__(self, bot_w: int, bot_h: int, logger_w: int, logger_h: int):
-        self.__BOT_BOX__ = TuiComponent(bot_w, bot_h, 1)
-        self.__LOG_BOX__ = TuiComponent(logger_w, logger_h, 41)
-
-
-logger: tui_logger = tui_logger(40, 20, 40, 20)
+#     def display_notifications(self) -> None:
+#         # self.root.mainloop()
+#         # root.after(1000, update)
+#         pass
 
 class Insanity(discord.Client, Config):
     Cmds:               list[str] = []
@@ -112,14 +58,16 @@ class Insanity(discord.Client, Config):
     async def on_ready(self):
         self.Commands = Config.retrieve_all_commands(COMMANDS_DIR, 0, self.Cmds)
 
-        self.BlacklistedTokens = Config.get_blacklisted_tokens()
+        self.BlacklistedTokens = database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedTokens.pop(len(self.BlacklistedTokens) - 1)
-        self.BlacklistedSkids = Config.get_skids()
 
-        self.Whitlist = Config.get_admins_list()
+        # self.BlacklistedSkids = Config.get_skids()
+        self.BlacklistedSkids = database(db_t.__SKIDS_PATH__, op_t.__read_db__, 0)
+        self.BlacklistedSkids.pop(len(self.BlacklistedSkids) - 1)
 
+        self.Whitlist = database(db_t.__ADMINS_PATH__, op_t.__read_db__, 0)
 
-        self.Blacklistjoin = Config.get_blacklistjoin_list()
+        self.Blacklistjoin = database(db_t.__BLACKLIST_JOIN_PATH__, op_t.__read_db__, 0)
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity API Streaming", url = "https://insanity.bot")
@@ -157,14 +105,6 @@ class Insanity(discord.Client, Config):
             else:
                 if (await self.OnJoin.handler(msg)) == False:
                     return
-                
-    async def vcmove(ctx, member: discord.Member, *, channel: discord.VoiceChannel):
-        """Move a member to another voice channel."""
-        if member.voice:
-            await member.move_to(channel)
-            await ctx.send(f"Moved {member.display_name} to {channel.name}.")
-        else:
-            await ctx.send(f"{member.display_name} is not in a voice channel.")
 
     """
         [ On Message Delete ]

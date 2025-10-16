@@ -41,7 +41,8 @@ async def watchvc(base, message: DiscordUtils) -> bool:
                 while region != base.LastRegion and region != base.CurrentRegion:
                     region = base.AVAILABLE_REGIONS[random.randint(0, (len(base.AVAILABLE_REGIONS) - 1))]
 
-                base.CurrentRegion = region
+            base.LastRegion = base.CurrentRegion
+            base.CurrentRegion = region
             await vc.channel.edit(rtc_region = region)
             await message.send_embed("Watch VC", f"High latency detected, Switching VC region to ``{region}``....!\n")
 

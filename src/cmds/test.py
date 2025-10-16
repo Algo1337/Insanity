@@ -23,7 +23,7 @@ async def test(base, msg: DiscordUtils) -> bool:
     if opt == "--s":
         path = msg.Args[2]
         fn_n = msg.Args[3]
-        code = f"import discord\nfrom src.discord_utils import *\n\nasync def {fn_n}(base, msg: DiscordUtils) -> bool:\n"
+        code = f"import discord\nfrom src.discord_utils import *\n__{fn_n.upper()}_GET_BASE__ = True\n\nasync def {fn_n}(base, msg: DiscordUtils) -> bool:\n"
 
     lines = msg.Client.content.split("\n")
     start = False
@@ -46,11 +46,12 @@ async def test(base, msg: DiscordUtils) -> bool:
     f.write(f"{code}")
     f.close()
     
+    obj = Cog(fn_n, fn_n, Config.load_object_from_file(f"{fn_n}_cmd", path, fn_n), path)
     if opt == "--s":
         await msg.send_embed("New Command", f"{fn_n} command successfully saved!")
+        base.Cmds.append(obj)
         return
     
-    obj = Config.load_object_from_file("test", "code.py", "test_cmd")
     fn = getattr(obj, "test")
     
     await fn(base, msg)

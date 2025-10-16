@@ -33,7 +33,7 @@ def database(db: db_t, op: op_t, query: int | str) -> bool | str:
         data = file.read().split("\n")
         for line in data:
             if query not in line:
-                new_db = f"{data}\n"
+                new_db += f"{line}\n"
 
         file.close()
         file = open(db, "w")
@@ -75,6 +75,10 @@ class Cog:
 
 class Config:
     PREFIX = ">"
+    SKID_PATH = "assets/skids.log"
+    BLACKLIST_JOIN_PATH: str = "assets/blacklist_join.log"
+    BLACKLISTED_TOKENS_PATH: str = "assets/blacklisted_token.log"
+    ADMINS_PATH: str = "assets/admins.log"
     def get_token() -> str:
         f = open("/cfg/token.cfg", "r")
         t = f.read()
@@ -103,10 +107,6 @@ class Config:
                 Cmds.append(Cog(name, name, Config.load_object_from_file(f"{name}_cmd", f"{CURRENT_DIR}/{item}", name), f"{CURRENT_DIR}/{item}"))
 
             if os.path.isdir(f"{CURRENT_DIR}/{item}"):
-                # if inner_dir > 0:
-                #     args = dir.split("/")
-                #     dir = "/".join(args[:len(args) - 2])
-
                 dir += f"/{item}"
                 Files.update(Config.retrieve_all_commands(dir, inner_dir + 1, Cmds))
                 dir = dir.replace(f"/{item}", "")

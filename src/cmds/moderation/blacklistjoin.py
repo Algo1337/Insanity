@@ -22,10 +22,11 @@ async def blacklistjoin(base, message: DiscordUtils) -> bool:
                 await memb.kick()
                 
         base.Blacklistjoin.append(f"{user_id}")
-        Config.add_blacklistjoin(user_id)
+        database(db_t.__BLACKLIST_JOIN_PATH__, op_t.__add_id__, user_id)
         await message.send_embed("Blacklist Join", f"User <@{user_id}> has been successully blacklisted from joining!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     elif opt == "--rm":
         base.Blacklistjoin.remove(user_id)
+        database(db_t.__BLACKLIST_JOIN_PATH__, op_t.__rm_id__, user_id)
         await message.send_embed("Blacklist Join", f"User <@{user_id}> has been successfully removed from blacklist joining", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
     else:
         await message.send_embed("Blacklist Join | Error", "Invalid arguments provided....!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")

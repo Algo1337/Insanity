@@ -26,9 +26,10 @@ async def bltoken(base, message: DiscordUtils) -> bool:
 
     if opt == "--add":
         base.BlacklistedTokens.append(token)
-        Config.add_blacklisted_tokens(token)
+        database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__add_id__, token)
         await message.send_embed("Blacklist Token", "Token has successfully been added to blacklist")
     elif opt == "--rm": 
+        database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__rm_id__, token)
         await message.send_embed("Blacklist Token", "Token has successfully been added to blacklist")
 
         if token in base.BlacklistedTokens:
