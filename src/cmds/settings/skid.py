@@ -21,7 +21,6 @@ async def skid(base, msg: DiscordUtils) -> True:
 
     if opt == "--add":
         base.BlacklistedSkids.append(userid)
-        # Config.add_blacklistskid(userid)
         database(db_t.__SKIDS_PATH__, op_t.__add_id__, userid)
         
         if "--strip" in msg.Args:

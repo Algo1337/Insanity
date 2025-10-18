@@ -7,22 +7,61 @@ from src.discord_utils import *
 
 COMMANDS_DIR = "/src/cmds"
 
-# class Notifications:
-#     gui: tk.Tk
-#     def __init__(self):
-#         self.root = tk.Tk()
-#         self.root.overrideredirect(True)
-#         self.root.geometry(f"400x200+10+10")
-#         self.root.configure(bg="black")
-#         self.root.attributes("-topmost", True)
-#         self.root.attributes("-alpha", 1.0)
+# class NotifyGUI:
+#     GuiHandler      : tk.Tk
+#     Label           : tk.Label
+#     Width           : int = 0
+#     Height          : int = 0
+#     Buffer          : str = ""
+#     DisplayCounter  : int = 5
+#     def __init__(self, width=400, height=100, x=100, y=100, opacity=1.0):
+#         self.Width = width
+#         self.Height = height
 
-#         self.root.bind("<Escape>", lambda e: self.root.destroy())
+#         self.GuiHandler = tk.Tk()
+#         self.GuiHandler.overrideredirect(True)  # no title bar or borders
+#         self.GuiHandler.geometry(f"{width}x{height}+{x}+{y}")
+#         self.GuiHandler.configure(bg="black")
+#         self.GuiHandler.attributes("-topmost", True)  # stays above all windows
+#         self.GuiHandler.attributes("-alpha", 1.0)  # transparency (1.0 = opaque, 0.0 = invisible)
 
-#     def display_notifications(self) -> None:
-#         # self.root.mainloop()
-#         # root.after(1000, update)
-#         pass
+#         noticeLabel = tk.Label(
+#             self.GuiHandler,
+#             text="New Notifications",
+#             bg="black",
+#             fg="white",
+#             font=("Segoe UI", 14, "bold"),
+#             wraplength=width - 20,
+#             justify="center"
+#         )
+#         noticeLabel.pack(expand=True, fill="both", padx=10, pady=10) 
+
+#         self.Label = tk.Label(
+#             self.GuiHandler,
+#             text="",
+#             bg="black",
+#             fg="white",
+#             font=("Segoe UI", 9, "bold"),
+#             wraplength=width - 20,
+#             justify="left"
+#         )
+#         self.Label.pack(expand=True, fill="both", padx=5, pady=5)  
+#         self.GuiHandler.bind("<Escape>", lambda e: NotifyGUI.destroy())
+
+#     def add_text(self, data) -> None:
+#         self.Buffer += f"{data}\n\n"
+#         self.Height += 50
+
+#     def update_text(self) -> None:
+#         self.GuiHandler.geometry(f"{self.Width}x{self.Height}")
+#         self.Label.config(text = self.Buffer)
+
+#     def dispaly_gui(self) -> None:
+#         # threading.Thread(target = self.GuiHandler.mainloop).start()
+#         self.GuiHandler.after(500, self.update_text)
+
+#     def hide_gui(self) -> None:
+#         self.GuiHandler.destroy()
 
 class Insanity(discord.Client, Config):
     Cmds:               list[str] = []
@@ -38,18 +77,23 @@ class Insanity(discord.Client, Config):
     CurrentRegion:      str = ""                # Current Region being watched for attacks
     LastRegion:         str = ""                # Last region, Incase it needs to change twice
     AVAILABLE_REGIONS:  list[str] = [           # Available Regions
-        'us-west', 
-        'us-east', 
-        'us-central', 
-        'us-south'
-        'singapore', 
-        'japan', 
-        'hongkong', 
-        'brazil',
-        'sydney', 
-        'southafrica', 
-        'india'
-        # 'rotterdam'
+        'us-west',
+        'us-east',
+        'us-central',
+        'us-south',
+        # 'singapore',
+        # 'japan',
+        # 'hongkong',
+        # 'brazil',
+        # 'sydney',
+        # 'southafrica',
+        # 'india',
+        # 'rotterdam',
+        # 'russia',
+        # 'europe',
+        # 'frankfurt',
+        # 'london',
+        # 'dubai'
     ]
 
     """
@@ -57,7 +101,8 @@ class Insanity(discord.Client, Config):
     """
     async def on_ready(self):
         self.Commands = Config.retrieve_all_commands(COMMANDS_DIR, 0, self.Cmds)
-
+        # self.Gui = NotifyGUI()
+        # self.Gui.dispaly_gui()
         self.BlacklistedTokens = database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedTokens.pop(len(self.BlacklistedTokens) - 1)
 
@@ -70,7 +115,7 @@ class Insanity(discord.Client, Config):
         self.Blacklistjoin = database(db_t.__BLACKLIST_JOIN_PATH__, op_t.__read_db__, 0)
         await self.change_presence(
             status = discord.Status.dnd,
-            activity = discord.Streaming(name = "Insanity API Streaming", url = "https://insanity.bot")
+            activity = discord.Streaming(name = "Insanity API", url = "https://insanity.bot")
         )
 
         print(f"[ + ] Firing up {self.user}....!")
@@ -122,6 +167,9 @@ class Insanity(discord.Client, Config):
 
     async def on_message(self, message):
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
+        msg.set_log_channel("logs")
+
+        ## fix this
         if self.OnMessage:
             if self.OnMessage.SendBase:
                 if (await self.OnMessage.handler(self, msg)) == False:
@@ -169,4 +217,4 @@ inits.message_content = True
 print("[ + ] Initializing Insanity bot....!")
 bot = Insanity(intents = inits, Config = Config())
 print("[ + ] Running bot...!")
-bot.run(Config.get_token())
+bot.run(get_bot_token())

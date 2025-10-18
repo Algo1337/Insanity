@@ -5,16 +5,9 @@ from src.discord_utils import *
 ____ON_JOIN___GET_BASE__ = True
 
 async def __on_join__(base, message: DiscordUtils) -> bool:
-    
-    if not message.Client:
-        print("NONE")
-
-    print(f"[ + ] Join {message.Client.name} {message.Client.id}")
-    print(base.BlacklistedSkids)
+    print(f"[ + ] New Server Member: {message.Client.name} | {message.Client.id}")
 
     if f"{message.Client.id}" in base.BlacklistedSkids:
-        print("HERE")
-        await asyncio.sleep(3)
         all_roles = []
         new_roles = [ discord.utils.get(message.Client.guild.roles, name = "skidfield") ]
         

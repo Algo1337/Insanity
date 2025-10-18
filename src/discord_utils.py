@@ -1,5 +1,7 @@
 import discord, enum, requests, asyncio
 
+from .config import *
+
 class Discord_Event_T(enum.Enum):
     e_none              = 0
     e_joined            = 1
@@ -9,13 +11,14 @@ class Discord_Event_T(enum.Enum):
     e_vc                = 5
 
 class DiscordUtils():
-    Cmd: str                    = ""
-    Args: list[str]             = []
-    Data: str                   = ""
-    dClient                     = None
-    Client                      = None
-    Client_T: Discord_Event_T   = Discord_Event_T.e_none
-    def __init__(self, dClient, message, event_t: Discord_Event_T):    
+    Cmd         : str = ""
+    Args        : list[str] = []
+    Data        : str = ""
+    dClient     = None
+    Client      = None
+    Client_T    : Discord_Event_T = Discord_Event_T.e_none
+    LogChannel  : str | int
+    def __init__(self, dClient, message, event_t: Discord_Event_T):
         self.dClient = dClient
         self.Client_T = event_t
         self.Client = message
@@ -29,6 +32,21 @@ class DiscordUtils():
             else:
                 self.Args = []
                 self.Cmd = self.Data
+
+    def set_log_channel(self, channel: str | int) -> None:
+        self.LogChannel = channel
+
+    async def log(self, action: action_t, data: str | discord.Embed) -> None:
+        channel = self.dClient.get_channel(self.LogChannel)
+        
+        if not channel:
+            print("[ x ] Error, Unable to get log channel!")
+            return
+        
+        if isinstance(data, str):
+            await channel.send(data)
+        else:
+            await channel.send(embed = data)
 
     def get_arg(self, pos: int) -> str:
         return self.Args[pos]

@@ -10,7 +10,7 @@ __TEST_INVALID_ARG_ERR__.set_thumbnail(url = "https://images-ext-1.discordapp.ne
 __TEST_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
 __TEST_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
-async def test(base, msg: DiscordUtils) -> bool:
+async def code(base, msg: DiscordUtils) -> bool:
     # if msg.Client.author.id != 1396851228478013515:
     #     await msg.Client.channel.send(embed = __TEST_INVALID_ARG_ERR__)
     #     return

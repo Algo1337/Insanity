@@ -16,6 +16,7 @@ __WATCHVC_INVALID_ARG_ERR__.set_footer(text = "https://insanity.host")
 async def watchvc(base, message: DiscordUtils) -> bool:
     await message.Client.delete()
     opt = message.Args[1]
+    # ms = sum(message.Args[2])
 
     vc: discord.VoiceClient = None
     chan = None
@@ -30,12 +31,12 @@ async def watchvc(base, message: DiscordUtils) -> bool:
     if vc.channel.rtc_region:
         base.CurrentRegion = vc.channel.rtc_region
 
-    await message.send_embed("VC Watch", f"Joined <#{vc.channel.id}>, Watching for >= 300.00ms or higher latency!")
+    await message.send_embed("VC Watch", f"Joined <#{vc.channel.id}>, Watching for >= 350.00ms or higher latency!")
     base.WatchingVC = True
     while base.WatchingVC != False:
         latency = vc.latency * 1000
         print(f"Watching VC: {latency} | Current Region {base.CurrentRegion}")
-        if latency > 300.00 and f"{latency}" != "inf":
+        if latency > 350.00 and f"{latency}" != "inf":
             region = base.AVAILABLE_REGIONS[random.randint(0, (len(base.AVAILABLE_REGIONS) - 1))]
             if region == base.LastRegion or region == base.CurrentRegion:
                 while region != base.LastRegion and region != base.CurrentRegion:
