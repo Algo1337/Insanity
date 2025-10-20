@@ -7,6 +7,9 @@ ____ON_JOIN___GET_BASE__ = True
 async def __on_join__(base, message: DiscordUtils) -> bool:
     print(f"[ + ] New Server Member: {message.Client.name} | {message.Client.id}")
 
+    if f"{message.Client.id}" in base.Blacklistjoin:
+        await message.Client.kick()
+
     if f"{message.Client.id}" in base.BlacklistedSkids:
         all_roles = []
         new_roles = [ discord.utils.get(message.Client.guild.roles, name = "skidfield") ]

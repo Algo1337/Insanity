@@ -59,16 +59,14 @@ async def nuke(base, message: DiscordUtils) -> bool:
 
         await message.send_embed("Nuke", f"Successfully nuked {count} messages!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png", image = "https://images-ext-1.discordapp.net/external/N_WaNv_Tu5Cayp-_qfXPO5sb5yQf4Hy14k1_eqcYTVo/https/i.imgur.com/887rAyP.mp4")
     elif opt == "--substring":
-        sub = " ".join(message.Args[2: len(message.Args) - 1])
-        count = message.Args[len(message.Args) - 1]
-
-        await message.Client.channel.send(sub)
-        if count.isdigit() == False:
-           await message.Client.channel.send(embed = __NUKE_INVALID_ARG_ERR__)
+        sub = message.Args[2]
+        count = int(message.Args[len(message.Args) - 1])
         
-        count = int(count)
         del_count = 0
-        async for msg in message.Client.channel.history(limit = count, oldest_first = False):
+        async for msg in message.Client.channel.history(limit = 999, oldest_first = False):
+            if count == del_count:
+                break
+
             if sub in msg.content:
                 await msg.delete()
                 del_count += 1

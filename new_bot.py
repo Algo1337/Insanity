@@ -167,9 +167,7 @@ class Insanity(discord.Client, Config):
 
     async def on_message(self, message):
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
-        msg.set_log_channel("logs")
 
-        ## fix this
         if self.OnMessage:
             if self.OnMessage.SendBase:
                 if (await self.OnMessage.handler(self, msg)) == False:
