@@ -16,7 +16,11 @@ pip3 -r modules
 
 ### Bot Key
 
-Create ``token.cfg`` and add your bot token in it
+Create ``/cfg/token.cfg`` and add your bot token in it
+
+```
+nano /cfg/token.cfg
+```
 
 ### Log/Db Files
 
