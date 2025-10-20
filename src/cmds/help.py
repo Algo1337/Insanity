@@ -31,8 +31,7 @@ async def help(message: DiscordUtils):
                 "**Nuke**": "```>nuke```",
                 "**Kick**": "```>kick```",
                 "**Ban**": "```>ban```",
-                "**Last 3 Deleted Messages**": "```>deleted```",
-                "**Blacklist Join**": "```>blacklistjoin```"
+                "**Deleted Messages**": "```>deleted```",
             }, author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         elif message.Args[1] == "-settings":
             await message.send_embed("Settings", "List of setting(s) commands\n\nThese commands are for whitlisted users only!\n\nKeep in mind: ``?`` stands for optional argument", {
@@ -40,6 +39,9 @@ async def help(message: DiscordUtils):
                 "**Stop Watch**": "```>stopwatch```",
                 "**Switch VC Region**": "```>switch```",
                 "**Whitlist user**": "```>whitlist```",
+                "**Blacklist Skid**": "```>skid```",
+                "**Commands**": "```>commands```",
+                "**Steal**": "```>steal```"
             }, author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         return
 

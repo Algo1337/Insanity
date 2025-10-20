@@ -17,7 +17,7 @@ class DiscordUtils():
     dClient     = None
     Client      = None
     Client_T    : Discord_Event_T = Discord_Event_T.e_none
-    LogChannel  : str | int
+    LogChannel  : str | int = "logs"
     def __init__(self, dClient, message, event_t: Discord_Event_T):
         self.dClient = dClient
         self.Client_T = event_t

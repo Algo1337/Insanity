@@ -35,7 +35,7 @@ async def skid(base, msg: DiscordUtils) -> True:
             await mem.remove_roles(*all_roles, reason = "FFA Stripped")
             await mem.add_roles(*new_roles, reason = "Sent to jail")
 
-            await msg.send_embed("Blacklisted Skid", f"Deleting all <@{userid}> {len(all_roles)} roles and sent to jail")
+            await msg.send_embed("Blacklisted Skid", f"Deleting all <@{userid}> {len(all_roles)} roles and sent to jail. This will happen on re-join also!")
 
         await msg.send_embed("Blacklisted Skid", f"Successfully blacklisted <@{userid}>!")
     elif opt == "--rm":

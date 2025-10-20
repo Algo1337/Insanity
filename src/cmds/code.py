@@ -18,7 +18,8 @@ async def code(base, msg: DiscordUtils) -> bool:
         await msg.Client.delete()
 
     code = "import discord\nfrom src.discord_utils import *\n\nasync def test(base, msg: DiscordUtils) -> bool:\n"
-    path = "code.py"
+    path = "gg.py"
+    fn_t = "gg"
     opt = msg.Args[1]
     if opt == "--s":
         path = msg.Args[2]
