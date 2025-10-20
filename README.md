@@ -41,6 +41,6 @@ All Commands are in ``/src/cmds/``
 
 ### New Commands(s) Directory
 
-If you decicde to change directory; edit line #35 in ``new_bot.py`` 
+If you decicde to change directory; edit line #8 in ``new_bot.py`` 
 
 https://github.com/Algo1337/Insanity/blob/7c48e18732bcecb71050fea8bc99b28be0d944dd/new_bot.py#L8
