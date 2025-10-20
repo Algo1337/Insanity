@@ -12,9 +12,24 @@ sudo apt install python3-pip -y
 pip3 -r modules
 ```
 
-# Setup
+# Setup 
+
+### Bot Key
 
 Create ``token.cfg`` and add your bot token in it
+
+### Log/Db Files
+
+```
+mkdir assets
+touch assets/admins
+touch assets/blacklisted_token.log
+touch assets/blacklist_join.log
+touch assets/deleted
+touch logs
+touch assets/messages.log
+touch assets/skids.log
+```
 
 ### Commands
 
@@ -24,4 +39,4 @@ All Commands are in ``/src/cmds/``
 
 If you decicde to change directory; edit line #35 in ``new_bot.py`` 
 
-https://github.com/Algo1337/Insanity/blob/8e3f6a35f7cd880c42256b2bc985d56ac8aeb959/new_bot.py#L35
+https://github.com/Algo1337/Insanity/blob/7c48e18732bcecb71050fea8bc99b28be0d944dd/new_bot.py#L8
