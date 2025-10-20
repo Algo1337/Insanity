@@ -39,7 +39,7 @@ touch assets/skids.log
 
 All Commands are in ``/src/cmds/``
 
-### New Commands(s) Directory
+### New Command(s) Directory
 
 If you decicde to change directory; edit line #8 in ``new_bot.py`` 
 
