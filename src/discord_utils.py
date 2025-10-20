@@ -1,6 +1,7 @@
 import discord, enum, requests, asyncio
 
 from .config import *
+from datetime import datetime
 
 class Discord_Event_T(enum.Enum):
     e_none              = 0
@@ -8,7 +9,8 @@ class Discord_Event_T(enum.Enum):
     e_left              = 2
     e_message           = 3,
     e_message_del       = 4,
-    e_vc                = 5
+    e_vc                = 5,
+    e_kick              = 6
 
 class DiscordUtils():
     Cmd         : str = ""
@@ -17,7 +19,7 @@ class DiscordUtils():
     dClient     = None
     Client      = None
     Client_T    : Discord_Event_T = Discord_Event_T.e_none
-    LogChannel  : str | int = 1397686339520168108
+    LogChannel  : int = 1429849671613808741
     def __init__(self, dClient, message, event_t: Discord_Event_T):
         self.dClient = dClient
         self.Client_T = event_t
@@ -36,17 +38,39 @@ class DiscordUtils():
     def set_log_channel(self, channel: str | int) -> None:
         self.LogChannel = channel
 
-    async def log(self, action: action_t, data: str | discord.Embed) -> None:
+    async def log(self, action: action_t, data: str, fields: dict[str, str] = None) -> None:
+        local_tz = pytz.timezone('America/Kentucky/Louisville')
+        
+        if self.Client_T == Discord_Event_T.e_message or self.Client_T == Discord_Event_T.e_message_del:
+            timestamp = self.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
+        else:
+            timestamp = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
+
         channel = self.dClient.get_channel(self.LogChannel)
+
+        embed = discord.Embed(title = "Insanity Logs", description = f"New Log!\n\n{data}", color = discord.Colour.red())
+        embed.add_field(name = "Timestamp", value = f"{timestamp}", inline = True)
+        embed.add_field(name = "Action", value = action.name, inline = True)
+        if hasattr(self.Client, "content"):
+            if "```" in self.Client.content:
+                embed.add_field(name = "Message", value = self.Client.content, inline = False)
+            elif self.Client.stickers:
+                embed.add_field(name = "Message", value = "Sticker Attachment", inline = False)
+            else:
+                embed.add_field(name = "Message", value = f"```{self.Client.content}```", inline = False)
         
         if not channel:
             print("[ x ] Error, Unable to get log channel!")
             return
         
-        if isinstance(data, str):
-            await channel.send(data)
-        else:
-            await channel.send(embed = data)
+        if fields != None:
+            for field in fields:
+                if isinstance(fields[field], list):
+                    embed.add_field(name = field, value = fields[field][0], inline = fields[field][1])
+                else:
+                    embed.add_field(name = field, value = fields[field], inline = False)
+        
+        await channel.send(embed = embed)
 
     def get_arg(self, pos: int) -> str:
         return self.Args[pos]

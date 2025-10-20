@@ -3,12 +3,12 @@ import os, importlib, enum, pytz
 from datetime import timezone
 
 class action_t(enum.Enum):
-    __ON_MESSAGE__            = 0
-    __ON_MESSAGE_DELETE__     = 1
-    __ON_JOIN__               = 2
-    __ADMIN_ACTION__          = 3
-    __ON_JOIN__               = 4
-    __ON_VC_JOIN__            = 5
+    ON_MESSAGE            = 0
+    ON_MESSAGE_DELETE     = 1
+    ON_JOIN               = 2
+    ADMIN_ACTION          = 3
+    ON_VC_JOIN            = 4
+    ON_REMOVE             = 5
 
 class op_t(enum.Enum):
     __read_db__ = "read"

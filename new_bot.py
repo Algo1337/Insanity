@@ -164,9 +164,30 @@ class Insanity(discord.Client, Config):
             else:
                 if (await self.OnMessageDelete.handler(msg)) == False:
                     return
+                
+    async def on_member_remove(self, member):
+        msg = DiscordUtils(self, member, Discord_Event_T.e_kick)
+        msg.set_log_channel(1429855130081165364)
+
+        # This fires for any leave, kick, or ban
+        guild = member.guild
+        async for entry in guild.audit_logs(limit=2, action=discord.AuditLogAction.kick):
+            if entry.target.id == member.id:
+                if entry.action == discord.AuditLogAction.kick:
+                    await msg.log(action_t.ON_REMOVE, f"User: {member} was kicked by {entry.user}")
+                else:
+                    await msg.log(action_t.ON_REMOVE, f"User: {member} was banned by {entry.user}")
+                
+                break
 
     async def on_message(self, message):
+        if message.author == self.user:
+            return
+        
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
+        msg.set_log_channel(1429855130081165364)
+        if message.content.startswith(Config.PREFIX):
+            await msg.log(action_t.ON_MESSAGE, "")
 
         if self.OnMessage:
             if self.OnMessage.SendBase:
