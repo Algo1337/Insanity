@@ -105,14 +105,17 @@ class Insanity(discord.Client, Config):
         # self.Gui.dispaly_gui()
         self.BlacklistedTokens = database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedTokens.pop(len(self.BlacklistedTokens) - 1)
+        print(self.BlacklistedTokens)
 
         # self.BlacklistedSkids = Config.get_skids()
         self.BlacklistedSkids = database(db_t.__SKIDS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedSkids.pop(len(self.BlacklistedSkids) - 1)
 
         self.Whitlist = database(db_t.__ADMINS_PATH__, op_t.__read_db__, 0)
+        self.Whitlist.pop(len(self.Whitlist) - 1)
 
         self.Blacklistjoin = database(db_t.__BLACKLIST_JOIN_PATH__, op_t.__read_db__, 0)
+        self.Blacklistjoin.pop(len(self.Blacklistjoin) - 1)
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity API", url = "https://insanity.bot")

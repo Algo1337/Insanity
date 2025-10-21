@@ -50,16 +50,16 @@ def database(db: db_t, op: op_t, query: int | str) -> bool | str:
         return True
     elif op == op_t.__rm_id__:
         """ Remove Query from file """
-        new_db = ""
+        lines: list[str] = []
         file = open(db, "r")
         data = file.read().split("\n")
         for line in data:
             if query not in line:
-                new_db += f"{line}\n"
+                lines.append(line)
 
         file.close()
         file = open(db, "w")
-        file.write(new_db)
+        file.write("\n".join(lines))
         file.close()
 
         return True
