@@ -43,7 +43,6 @@ def download_video(url: str, outdir: str = "assets/yt") -> str:
         return filename
 
 async def yt(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     opt = message.Args[1]
     url = message.Args[2]
 

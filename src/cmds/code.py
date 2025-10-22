@@ -11,12 +11,6 @@ __TEST_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://image
 __TEST_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
 async def code(base, msg: DiscordUtils) -> bool:
-    # if msg.Client.author.id != 1396851228478013515:
-    #     await msg.Client.channel.send(embed = __TEST_INVALID_ARG_ERR__)
-    #     return
-    if "--q" in msg.Client.content:
-        await msg.Client.delete()
-
     code = "import discord\nfrom src.discord_utils import *\n\nasync def test(base, msg: DiscordUtils) -> bool:\n"
     path = "gg.py"
     fn_t = "gg"

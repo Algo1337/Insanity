@@ -14,7 +14,6 @@ __WATCHVC_INVALID_ARG_ERR__.set_footer(text = "https://insanity.host")
 
 
 async def watchvc(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     opt = message.Args[1]
     ms = float(message.Args[2])
 

@@ -6,9 +6,8 @@ import discord
 from src.discord_utils import *
 
 async def help(message: DiscordUtils):
-    await message.Client.delete()
 
-    if message.Args.__len__() > 0:
+    if message.Args.__len__() > 1:
         if message.Args[1] == "-info":
             await message.send_embed("Fun", "List of info commands\n\nKeep in mind: ``?`` stands for optional argument", {
                 "**Servers I'm In**": "```>servers```",

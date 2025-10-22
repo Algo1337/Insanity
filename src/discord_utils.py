@@ -110,6 +110,9 @@ class DiscordUtils():
         return False
     
     async def send_embed(self, title: str, desc: str, fields: dict = None, author_name: str = None, author_url: str = None, image: str = None, images: list[str] = None) -> bool:
+        if "--nostdout" in self.Args:
+            return
+        
         embed = discord.Embed(title = title, description = desc, color = discord.Colour.red())
 
         if image != None:

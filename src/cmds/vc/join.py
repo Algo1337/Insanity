@@ -11,7 +11,6 @@ __JOIN_INVALID_ARG_ERR__.set_author(name = "Insanity")
 __JOIN_INVALID_ARG_ERR__.set_footer(text = "https://insanity.host")
 
 async def join(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     join_query = message.Args[1].replace("<#", "").replace(">", "")
     
     if join_query == "--me":

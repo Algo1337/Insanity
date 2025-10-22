@@ -11,7 +11,6 @@ __SWITCH_INVALID_ARG_ERR__.set_thumbnail(url = "https://images-ext-1.discordapp.
 __SWITCH_INVALID_ARG_ERR__.set_footer(text = "http://insanity.host")
 
 async def switch(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     opt = message.Args[1].replace("<@", "").replace(">", "")
 
     if opt == "--vc":

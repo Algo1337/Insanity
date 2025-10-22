@@ -23,7 +23,6 @@ __NUKE_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://image
 __NUKE_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
 async def nuke(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     opt = message.Args[1]
 
     perms = message.Client.channel.permissions_for(message.Client.guild.me)

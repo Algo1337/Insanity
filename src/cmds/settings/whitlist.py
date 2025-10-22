@@ -11,9 +11,7 @@ __WHITLIST_INVALID_ARG_ERR__.set_image(url = "https://media.discordapp.net/attac
 __WHITLIST_INVALID_ARG_ERR__.set_author(name = "Insanity")
 __WHITLIST_INVALID_ARG_ERR__.set_footer(text = "https://insanity.host")
 
-async def whitlist(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
-    
+async def whitlist(base, message: DiscordUtils) -> bool:    
     opt = message.Args[1]
     if opt == "--view":
         whilisted_users = ""

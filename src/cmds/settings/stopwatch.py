@@ -8,8 +8,6 @@ __STOPWATCH_INVALID_ARG_ERR__ = discord.Embed(title = "Error", description = "Er
 
 
 async def stopwatch(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
-
     base.WatchingVC = False
     await message.send_embed("Stop VC Watch", "VC watch successfully stopped!")
     return True

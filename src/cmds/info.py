@@ -13,7 +13,6 @@ __INFO_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://image
 __INFO_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
 async def info(base, msg: DiscordUtils) -> bool:
-    await msg.Client.delete()
     opt = msg.Args[1]
 
     if opt == "--me":

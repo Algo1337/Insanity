@@ -13,7 +13,6 @@ __BAN_INVALID_ARG_ERR__.set_author(name = "Insanity")
 __BAN_INVALID_ARG_ERR__.set_footer(text = "http://insanity.host")
 
 async def ban(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     if not (message.Client.author.guild_permissions.administrator and message.Client.author.guild_permissions.manage_messages):
         await message.send_embed("Ban | Error", "You must be an adminstrator of this server to use this command!\n")
         return

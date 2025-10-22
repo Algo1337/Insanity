@@ -9,7 +9,6 @@ from src.discord_utils import *
 __TTS_ARG_COUNT__ = 2
 
 async def tts(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
     if not message.Client.author.voice:
         await message.send_embed("TTS | Error", "You must be in a VC to use this!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         return

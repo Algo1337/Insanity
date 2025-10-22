@@ -105,7 +105,6 @@ class Insanity(discord.Client, Config):
         # self.Gui.dispaly_gui()
         self.BlacklistedTokens = database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedTokens.pop(len(self.BlacklistedTokens) - 1)
-        print(self.BlacklistedTokens)
 
         # self.BlacklistedSkids = Config.get_skids()
         self.BlacklistedSkids = database(db_t.__SKIDS_PATH__, op_t.__read_db__, 0)
@@ -191,6 +190,10 @@ class Insanity(discord.Client, Config):
         msg.set_log_channel(1429855130081165364)
         if message.content.startswith(Config.PREFIX):
             await msg.log(action_t.ON_MESSAGE, "")
+
+        if "--nostdin" in msg.Args:
+            msg.Args.remove("--nostdin")
+            await msg.Client.delete()
 
         if self.OnMessage:
             if self.OnMessage.SendBase:

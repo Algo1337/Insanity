@@ -36,8 +36,6 @@ def get_deleted_msgs(guild_id: int, user_id = None, maxc = 3) -> str:
     return data
 
 async def deleted(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
-
     if "--h" in message.Data:
         await message.Client.channel.send(embed = __DELETED_INVALID_ARG_ERR__)
         return True
