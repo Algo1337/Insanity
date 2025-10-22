@@ -18,6 +18,7 @@ class DiscordUtils():
     Data        : str = ""
     dClient     = None
     Client      = None
+    NoStdout    : bool = False
     Client_T    : Discord_Event_T = Discord_Event_T.e_none
     LogChannel  : int = 1429849671613808741
     def __init__(self, dClient, message, event_t: Discord_Event_T):
@@ -34,6 +35,10 @@ class DiscordUtils():
             else:
                 self.Args = []
                 self.Cmd = self.Data
+
+            if "--nostdout" in self.Args:
+                self.NoStdout = True
+                self.Args.remove("--nostdout")
 
     def set_log_channel(self, channel: str | int) -> None:
         self.LogChannel = channel
@@ -110,7 +115,7 @@ class DiscordUtils():
         return False
     
     async def send_embed(self, title: str, desc: str, fields: dict = None, author_name: str = None, author_url: str = None, image: str = None, images: list[str] = None) -> bool:
-        if "--nostdout" in self.Args:
+        if self.NoStdout == True:
             return
         
         embed = discord.Embed(title = title, description = desc, color = discord.Colour.red())

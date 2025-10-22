@@ -8,9 +8,7 @@ __SAY_INVALID_ARG_ERR__ = discord.Embed(title = "Say", description = "Error, Inv
 __SAY_INVALID_ARG_ERR__.set_author(name = "Insanity")
 __SAY_INVALID_ARG_ERR__.set_footer(text = "http://insanity.host")
 
-async def say(base, message: DiscordUtils) -> bool:
-    await message.Client.delete()
-    
+async def say(base, message: DiscordUtils) -> bool:    
     if " " not in message.Data:
         await message.Client.channel.send(embed = __SAY_INVALID_ARG_ERR__)
         return

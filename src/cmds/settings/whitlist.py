@@ -27,7 +27,7 @@ async def whitlist(base, message: DiscordUtils) -> bool:
     user_id = message.Args[2].replace("<@", "").replace(">", "")
     if opt == "--add":
         base.Whitlist.append(user_id)
-        await message.send_embed("Whitlist", f"User: <@{user_id}> has been successfully added!", image = "https://media.discordapp.net/attachments/1400104223508533309/1400134712839770193/test.png?ex=688b8890&is=688a3710&hm=6e8c70c936bfbb7a6cbd9fb727e14d7a95d8b64d9be770a2d76044fc558a0c5e&=&format=webp&quality=lossless")
+        await message.send_embed("Whitlist", f"User: <@{user_id}> has been successfully added!")
 
         database(db_t.__ADMINS_PATH__, op_t.__add_id__, user_id)
         return True
@@ -35,5 +35,5 @@ async def whitlist(base, message: DiscordUtils) -> bool:
         base.Whitlist.remove(user_id)
         
         database(db_t.__ADMINS_PATH__, op_t.__rm_id__, user_id)
-        await message.send_embed("Whitlist", f"User: <@{user_id}> has been successfully removed!", image = "https://media.discordapp.net/attachments/1400104223508533309/1400134712839770193/test.png?ex=688b8890&is=688a3710&hm=6e8c70c936bfbb7a6cbd9fb727e14d7a95d8b64d9be770a2d76044fc558a0c5e&=&format=webp&quality=lossless")
+        await message.send_embed("Whitlist", f"User: <@{user_id}> has been successfully removed!")
     return True
