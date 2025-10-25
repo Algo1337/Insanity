@@ -9,12 +9,10 @@ async def help(message: DiscordUtils):
 
     if message.Args.__len__() > 1:
         if message.Args[1] == "-info":
-            await message.send_embed("Fun", "List of info commands\n\nKeep in mind: ``?`` stands for optional argument", {
+            await message.send_embed("Info", "List of info commands\n\nKeep in mind: ``?`` stands for optional argument", {
                 "**Servers I'm In**": "```>servers```",
                 "**All Commands**": "```>commands```",
-                "**My Info**": "```>info --me```",
-                "**Server Info**": "```>info --server```",
-                "**Permission Check**": "```>info --perms```"
+                "**Info Commands**": "```>info```"
             }, author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         elif message.Args[1] == "-fun":
             await message.send_embed("Fun", "List of fun commands\n\nKeep in mind: ``?`` stands for optional argument", {
