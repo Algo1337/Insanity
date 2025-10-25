@@ -81,19 +81,19 @@ class Insanity(discord.Client, Config):
         'us-east',
         'us-central',
         'us-south',
-        # 'singapore',
-        # 'japan',
-        # 'hongkong',
-        # 'brazil',
-        # 'sydney',
-        # 'southafrica',
-        # 'india',
-        # 'rotterdam',
-        # 'russia',
-        # 'europe',
-        # 'frankfurt',
-        # 'london',
-        # 'dubai'
+        'singapore',
+        'japan',
+        'hongkong',
+        'brazil',
+        'sydney',
+        'southafrica',
+        'india',
+        'rotterdam',
+        'russia',
+        'europe',
+        'frankfurt',
+        'london',
+        'dubai'
     ]
 
     """
@@ -106,7 +106,6 @@ class Insanity(discord.Client, Config):
         self.BlacklistedTokens = database(db_t.__BLACKLISTED_TOKENS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedTokens.pop(len(self.BlacklistedTokens) - 1)
 
-        # self.BlacklistedSkids = Config.get_skids()
         self.BlacklistedSkids = database(db_t.__SKIDS_PATH__, op_t.__read_db__, 0)
         self.BlacklistedSkids.pop(len(self.BlacklistedSkids) - 1)
 
@@ -193,7 +192,16 @@ class Insanity(discord.Client, Config):
 
         if "--nostdin" in msg.Args:
             msg.Args.remove("--nostdin")
+            msg.Data = msg.Data.replace("--nostdin", "")
             await msg.Client.delete()
+
+        if "--redirect" in msg.Args:
+            channel_value, i = msg.get_flag_value("--redirect")
+            print(f"Channel {msg.Args[i + 1]}")
+            msg.set_redirect_channel(int(msg.Args[i + 1]))
+            msg.Data = msg.Data.replace(f"{msg.Args[i + 1]}", "").replace("--redirect ", "")
+            msg.Args.pop(len(msg.Args) - 1)
+            msg.Args.pop(len(msg.Args) - 1)
 
         if self.OnMessage:
             if self.OnMessage.SendBase:

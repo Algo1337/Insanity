@@ -24,7 +24,7 @@ async def say(base, message: DiscordUtils) -> bool:
         Send to channel if set
     """
     if channel == None:
-        await message.Client.channel.send(" ".join(message.Args[1:]))
+        await message.send_message(" ".join(message.Args[1:]))
     else:
         await channel.send(" ".join(message.Args[2:]))
 
