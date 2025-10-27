@@ -76,6 +76,7 @@ class Insanity(discord.Client, Config):
     WatchingVC:         bool = False            # Watch VC Status/Toggle
     CurrentRegion:      str = ""                # Current Region being watched for attacks
     LastRegion:         str = ""                # Last region, Incase it needs to change twice
+    LastMessage:        DiscordUtils = None     # Last Message
     AVAILABLE_REGIONS:  list[str] = [           # Available Regions
         'us-west',
         'us-east',
@@ -157,6 +158,8 @@ class Insanity(discord.Client, Config):
     """
     async def on_message_delete(self, message):
         msg = DiscordUtils(self, message, Discord_Event_T.e_message_del)
+        msg.set_log_channel(1429855130081165364)
+
         if self.OnMessageDelete:
             if self.OnMessageDelete.SendBase:
                 if (await self.OnMessageDelete.handler(self, msg)) == False:

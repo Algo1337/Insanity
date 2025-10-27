@@ -72,7 +72,7 @@ async def yt(base, message: DiscordUtils) -> bool:
         output = download_video(url)
         await asyncio.sleep(3)
         await message.send_embed("Video Download", f"The request video has successfully downloaded! '{output}'!")
-        await message.Client.channel.send(file = discord.File(output))
+        await message.send_message(file = discord.File(output))
 
 
     

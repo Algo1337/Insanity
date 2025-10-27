@@ -28,7 +28,9 @@ async def __on_message_delete__(base, message: DiscordUtils) -> bool:
     if channel:
         await channel.send(embed = discord.Embed(title = f"Logs | Message Deleted", description = f"<@{message.Client.author.id}> has deleted their message!\n\nMessage:```{message.Client.content}```", colour = discord.Colour.red()))
                            
+    await message.log(action_t.ON_MESSAGE_DELETE, f"{message.Client.author.display_name}", {"Reason": "DELETED_MESSAGE", "Author": message.Client.author.name})
 
     if not append_to_logs(f"[ DELETED MESSAGE: {timestamp} ] {message.Client.id} | {message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id} | {message.Client.author.display_name}:{message.Client.author.name}: {message.Client.content}"):
         print("[ x ] Error, Failed to log message to file!\n")
+
     return True
