@@ -41,13 +41,13 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
         base.LastMessage = message
 
     if message.Client.content == "":
-        # await message.send_message("No content detected")
-        for sticker in message.Client.stickers:
-            message.Redirect = True
-            message.rChannel = 1432174942610260079
-            await message.redirect_message(f"{message.Client.author.display_name}/{message.Client.author.name} Sent a sticker ``{sticker.name}`` from ``{message.Client.guild.name}`` -> ``{message.Client.channel.name}``")
-            await message.redirect_message(f"{sticker.url}")
-            message.Redirect = False
+        if message.Client.stickers or len(message.Client.stickers) > 0:
+            for sticker in message.Client.stickers:
+                message.Redirect = True
+                message.rChannel = 1432174942610260079
+                await message.redirect_message(f"{message.Client.author.display_name}/{message.Client.author.name} Sent a sticker ``{sticker.name}`` from ``{message.Client.guild.name}`` -> ``{message.Client.channel.name}``")
+                await message.redirect_message(f"{sticker.url}")
+                message.Redirect = False
 
 
     local_tz = pytz.timezone('America/Kentucky/Louisville')

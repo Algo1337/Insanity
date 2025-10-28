@@ -22,5 +22,5 @@ async def last(base, msg: DiscordUtils) -> bool:
     else:
         info["Content"] = [f"{base.LastMessage.Client.content}", False]
 
-    await msg.send_embed("Last Message", f"{base.LastMessage.Client.content}", info)
+    await msg.send_embed("Last Message", f"The Last Message Captured", info)
     return True

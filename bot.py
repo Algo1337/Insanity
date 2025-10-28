@@ -77,6 +77,7 @@ class Insanity(discord.Client, Config):
     CurrentRegion:      str = ""                # Current Region being watched for attacks
     LastRegion:         str = ""                # Last region, Incase it needs to change twice
     LastMessage:        DiscordUtils = None     # Last Message
+    LastDeleted:        DiscordUtils = None     # Last Deleted Message
     AVAILABLE_REGIONS:  list[str] = [           # Available Regions
         'us-west',
         'us-east',
