@@ -206,7 +206,7 @@ class DiscordUtils():
             embed.set_thumbnail(url = author_url)
 
         if image != None:
-            embed.set_image(image = image)
+            embed.set_image(url = image)
 
         await self.Client.channel.send(embed = embed)
 
