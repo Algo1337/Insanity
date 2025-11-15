@@ -58,7 +58,7 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     
     ckh, string = (await blacklisted_token_check(message, base.BlacklistedTokens))
     if  ckh and f"{message.Client.author.id}" not in base.Whitlist:
-        await message.log(action_t.ON_MESSAGE_DELETE, f"{message.Client.author.display_name}", {"Reason": "BLACKLISTED_TOKEN", "Token": f"{string}", "Author": message.Client.author.name})
+        await message.log(action_t.ON_MESSAGE_DELETE, f"{message.Client.author.display_name}", {"Reason": f"BLACKLISTED_TOKEN -> ``{string}``", "Token": f"{string}", "Author": message.Client.author.name})
         await message.Client.delete()
 
     if f"{message.Client.author.id}" not in base.Whitlist:

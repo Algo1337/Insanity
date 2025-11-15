@@ -180,6 +180,8 @@ class Insanity(discord.Client, Config):
             if entry.target.id == member.id:
                 if entry.action == discord.AuditLogAction.kick:
                     await msg.log(action_t.ON_REMOVE, f"User: {member} was kicked by {entry.user}")
+                if entry.action == discord.AuditLogAction.kick:
+                    await msg.log(action_t.ON_REMOVE, f"User: {member} was banned by {entry.user}")
                 else:
                     await msg.log(action_t.ON_REMOVE, f"User: {member} was banned by {entry.user}")
                 
