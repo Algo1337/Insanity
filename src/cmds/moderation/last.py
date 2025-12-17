@@ -7,6 +7,21 @@ __LAST_ARG_COUNT__ = 0
 __LAST_INVALID_ARG_ERR__ = None
 
 async def last(base, msg: DiscordUtils) -> bool:
+    if base.LastDeleted:
+        info = {
+            "User":             [base.LastDeleted.Client.author.name, True],
+            "ID":               [f"{base.LastDeleted.Client.author.id}", True],
+            "Display Name":     [base.LastDeleted.Client.author.display_name, True],
+        }
+
+        if "`" not in base.LastDeleted.Client.content:
+            info["Content"] = [f"```{base.LastDeleted.Client.content}```", False]
+        else:
+            info["Content"] = [f"{base.LastDeleted.Client.content}", False]
+
+        await msg.send_embed("Last Message", f"The Last Message Captured", info)
+        return True
+    
     if not base.LastMessage:
         await msg.send_embed("Last Message", "No last message logged!")
         return
