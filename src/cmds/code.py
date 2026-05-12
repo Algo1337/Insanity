@@ -3,22 +3,26 @@ import os, discord
 from src.discord_utils import *
 from src.config import *
 
-__TEST_GET_BASE__ = True
-__TEST_ARG_COUNT__ = 2
-__TEST_INVALID_ARG_ERR__ = discord.Embed(title = "Testing Command", description = "A command to test new feature during runtime for owner only!", color = discord.Colour.red())
-__TEST_INVALID_ARG_ERR__.set_thumbnail(url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
-__TEST_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
-__TEST_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
+__CODE_GET_BASE__ = True
+__CODE_ARG_COUNT__ = 2
+__CODE_INVALID_ARG_ERR__ = discord.Embed(title = "Testing Command", description = "A command to test new feature during runtime for owner only!", color = discord.Colour.red())
+__CODE_INVALID_ARG_ERR__.set_thumbnail(url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
+__CODE_INVALID_ARG_ERR__.set_author(name = "Insanity", icon_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
+__CODE_INVALID_ARG_ERR__.set_footer(text = "https://insanity.bot")
 
 async def code(base, msg: DiscordUtils) -> bool:
+    if msg.Client.author.id != 1440844781218431029:
+        await msg.send_message("admin only")
+        return 
+    
     code = "import discord\nfrom src.discord_utils import *\n\nasync def test(base, msg: DiscordUtils) -> bool:\n"
     path = "gg.py"
-    fn_t = "gg"
+    fn_t = "test"
     opt = msg.Args[1]
     if opt == "--s":
         path = msg.Args[2]
         fn_n = msg.Args[3]
-        code = f"import discord\nfrom src.discord_utils import *\n__{fn_n.upper()}_GET_BASE__ = True\n\nasync def {fn_n}(base, msg: DiscordUtils) -> bool:\n"
+        code = f"import discord\nfrom src.discord_utils import *\n__{fn_n.upper()}_GET_BASE__ = True\n__{fn_n.upper()}_ARG_COUNT__ = 2\n__{fn_n.upper()}_INVALID_ARG_ERR__ = None\n\nasync def {fn_n}(base, msg: DiscordUtils) -> bool:\n"
 
     lines = msg.Client.content.split("\n")
     start = False
@@ -41,13 +45,14 @@ async def code(base, msg: DiscordUtils) -> bool:
     f.write(f"{code}")
     f.close()
     
-    obj = Cog(fn_n, fn_n, Config.load_object_from_file(f"{fn_n}_cmd", path, fn_n), path)
+    obj = Cog(fn_n, fn_n, Config.load_object_from_file(f"{fn_n}", path, fn_n), path)
     if opt == "--s":
         await msg.send_embed("New Command", f"{fn_n} command successfully saved!")
         base.Cmds.append(obj)
         return
     
-    fn = getattr(obj, "test")
+    fn = getattr(obj, fn_n)
+    base.Commands.append(obj);
     
     await fn(base, msg)
     return True

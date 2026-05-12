@@ -28,19 +28,23 @@ async def steal(base, message: DiscordUtils) -> bool:
     original = None
     if message.Client.reference:
         original = await message.Client.channel.fetch_message(message.Client.reference.message_id)
+        content = original.content
+    else:
+        content = None
 
         if opt == "--emoji":
-            emojis = message.get_emojis()
+            emojis = message.get_emojis(content)
+            print(emojis)
             if len(emojis) == 0:
                 await message.send_embed("Steal | Error", "No emojis in message detected....!\n")
                 return
             
-            r = random.randint(0, 99999999)
-            filename = f"images/{r}{img_t}"
             for emoji in emojis:
+                r = random.randint(0, 99999999)
+                filename = f"assets/images/{r}{img_t}"
                 do_steal(f"https://cdn.discordapp.com/emojis/{emoji}{img_t}", filename)
             
-            await message.send_embed("Steal", f"Emojis Successfully Downloaded: ```{', '.join(emojis)}```")
+            await message.send_embed("Steal", f"{len(emojis)} Emojis  Successfully Downloaded")
             return
         elif opt == "--sticker":
             stkr = None

@@ -210,10 +210,14 @@ class DiscordUtils():
 
         await self.Client.channel.send(embed = embed)
 
-    def get_emojis(self) -> list:
+    def get_emojis(self, data: str = None) -> list:
         emojis = []
 
-        for arg in self.Args:
+        args = self.Args
+        if data != None:
+            args = data.split(" ")
+
+        for arg in args:
             if arg.startswith("<") and arg.endswith(">"):
                 emoji_args = arg.split(":")
 

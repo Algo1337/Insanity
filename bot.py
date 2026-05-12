@@ -193,6 +193,7 @@ class Insanity(discord.Client, Config):
         
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
         msg.set_log_channel(1429855130081165364)
+        
         if message.content.startswith(Config.PREFIX):
             await msg.log(action_t.ON_MESSAGE, "")
 
