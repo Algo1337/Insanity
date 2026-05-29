@@ -81,11 +81,14 @@ async def nuke(base, message: DiscordUtils) -> bool:
         user_id = int(user_id)
         count = int(count)
         del_count = 0
-        async for msg in message.Client.channel.history(limit = count, oldest_first = False):
+        async for msg in message.Client.channel.history(limit = 1000, oldest_first = False):
             if msg.author.id == user_id:
                 await msg.delete()
                 del_count += 1
                 await asyncio.sleep(1/2)
+
+            if del_count == count:
+                    break
 
         await message.send_embed("Nuke", f"Successfully nuked {del_count} of <@{user_id}>'s messages!", author_name = "Insanity", author_url = "https://images-ext-1.discordapp.net/external/7bqZYfRkXl8ptusN1g9UbNJyef772k0uG-htjp6dOLU/%3Fsize%3D512/https/cdn.discordapp.com/icons/1370013148983201792/d26c2fddc3bdaf3a2fbd047c4fe4ec87.png")
         
