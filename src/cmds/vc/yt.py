@@ -47,10 +47,6 @@ async def yt(base, message: DiscordUtils) -> bool:
     url = message.Args[2]
 
     if opt == "--play":
-
-        if " " not in message.Client.content:
-            return
-
         await message.Client.author.voice.channel.edit(mute=False, deafen=True)
 
         with yt_dlp.YoutubeDL(YDL_OPTIONZ) as ydl:

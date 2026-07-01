@@ -7,7 +7,7 @@ ____ON_JOIN___GET_BASE__ = True
 async def __on_join__(base, message: DiscordUtils) -> bool:
     print(f"[ + ] New Server Member: {message.Client.name} | {message.Client.id}")
 
-    if f"{message.Client.id}" in base.Blacklistjoin:
+    if f"{message.Client.id}" in base.Blacklistjoin or f"{message.Client.id}" in BlacklistedSkids:
         await message.Client.kick()
 
     if f"{message.Client.id}" in base.BlacklistedSkids:
