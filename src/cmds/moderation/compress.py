@@ -1,6 +1,9 @@
-import os, discord, random, cv2, imageio
+import os, sys, subprocess, discord, random, cv2, imageio
+import imageio.v3 as iio
 
 from src.discord_utils import *
+
+TARGET = 512 * 1024
 
 __COMPRESS_ARG_COUNT__ = 2
 __COMPRESS_INVALID_ARG_ERR__ = discord.Embed(title = "Image/Gif Compressor", description = "Private NIGGA, FUCK OFF", color = discord.Colour.red())
@@ -15,7 +18,7 @@ async def compress(base, message: DiscordUtils) -> bool:
         opt = ".gif"
     
     r = random.randint(0, 99999999)
-    filename = f"images/{r}{opt}"
+    filename = f"assets/images/{r}{opt}"
     print(f"Downloading {url} -> {filename} -> images/{r}_compressed{opt}")
     DiscordUtils.download_image(url, filename)
 
@@ -36,18 +39,18 @@ async def compress(base, message: DiscordUtils) -> bool:
 
         imageio.mimsave(filename, frames, fps=10)
 
-    await asyncio.sleep(2)
-    Compressor.compress_gif(filename, f"images/{r}_compressed{opt}")
+    await asyncio.sleep(5)
+    Compressor.compress_gif(filename, f"assets/images/{r}_compressed{opt}")
     await asyncio.sleep(2)
 
     embed = discord.Embed(title = "Img/Gif Compressor", description = "The file has been compressed to 512KB, Ready for discord sticker/emoji", color = discord.Colour.red())
-    embed.set_image(url = f"attachment://images/{r}_compressed{opt}")
-    await message.Client.channel.send(file = discord.File(f"images/{r}_compressed{opt}", filename = f"images/{r}_compressed{opt}"), embed = embed)
+    embed.set_image(url = f"attachment://assets/images/{r}_compressed{opt}")
+    await message.Client.channel.send(file = discord.File(f"assets/images/{r}_compressed{opt}", filename = f"assets/images/{r}_compressed{opt}"), embed = embed)
 
     os.remove(filename)
 
     if "--save" not in message.Args:
-        os.remove(f"images/{r}_compressed{opt}")
+        os.remove(f"assets/images/{r}_compressed{opt}")
 
     return True
 
@@ -70,7 +73,8 @@ class Compressor():
         print(f"Successfully compressed!")
 
     def compress_png(input_path, temp_path):
-        img = Image.open(input_path)
+        #img = Image.open(input_path)
+        img = iio.imread(input_path)
         quality = 90
         scale = 1.0
 
@@ -84,50 +88,55 @@ class Compressor():
 
             scale *= Compressor.RESIZE_STEP  # reduce size
 
-    def compress_gif(input_path, temp_path, target_size_kb=512):
-        img = Image.open(input_path)
-        
-        # Reduce size (scale down)
-        scale_factor = 0.8  # start smaller if needed
-        width, height = img.size
-        new_width = int(width * scale_factor)
-        new_height = int(height * scale_factor)
-        img = img.resize((new_width, new_height), Image.LANCZOS)
+    @staticmethod
+    def size(p): return os.path.getsize(p)
 
-        # Reduce colors
-        img = img.convert("P", palette=Image.ADAPTIVE, colors=64)
+    @staticmethod
+    def run(inp, outp, lossy, fps, width):
+        vf = []
 
-        # Save with optimization
-        frames = []
-        for frame in ImageSequence.Iterator(img):
-            frames.append(frame.copy())
+        if fps:
+            vf.append(f"fps={fps}")
 
-        # Try multiple quality attempts until under size
-        for colors in [64, 48, 32, 16]:
-            for scale in [0.8, 0.7, 0.6, 0.5]:
-                test_img = img.resize((int(width * scale), int(height * scale)), Image.LANCZOS)
-                test_img = test_img.convert("P", palette=Image.ADAPTIVE, colors=colors)
+        if width:
+            vf.append(f"scale={width}:-1:flags=lanczos")
 
-                frames_resized = []
-                for frame in frames:
-                    f = frame.resize((int(width * scale), int(height * scale)), Image.LANCZOS)
-                    f = f.convert("P", palette=Image.ADAPTIVE, colors=colors)
-                    frames_resized.append(f)
+        vf_str = ",".join(vf)
 
-                buffer = io.BytesIO()
-                frames_resized[0].save(
-                    buffer,
-                    format="GIF",
-                    save_all=True,
-                    append_images=frames_resized[1:],
-                    optimize=True,
-                    loop=0
-                )
-                size_kb = len(buffer.getvalue()) / 1024
-                if size_kb <= target_size_kb:
-                    with open(temp_path, "wb") as f:
-                        f.write(buffer.getvalue())
-                    print(f"Saved under {target_size_kb}KB at {colors} colors, {scale:.2f} scale ({size_kb:.1f}KB)")
-                    return True
-        print("Could not compress under target size.")
-        return False
+        if vf_str:
+            vf_complex = (
+                f"{vf_str},split[s0][s1];"
+                f"[s0]palettegen[p];"
+                f"[s1][p]paletteuse=dither=bayer:bayer_scale=5"
+            )
+        else:
+            vf_complex = (
+                "split[s0][s1];"
+                "[s0]palettegen[p];"
+                "[s1][p]paletteuse=dither=bayer:bayer_scale=5"
+            )
+
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", inp,
+            "-filter_complex", vf_complex,
+            "-loop", "0",
+            outp
+        ]
+
+        subprocess.run(cmd, check=True)
+
+    @staticmethod
+    def compress_gif(input_path, temp_path):
+        width=None
+        fps=None
+        for lossy in [20,40,60,80,120,160,200]:
+            try:
+                Compressor.run(input_path,temp_path,lossy,fps,width)
+            except Exception:
+                print("ffmpeg with gif lossy not available. Install a build with gif support.")
+                return
+            if Compressor.size(temp_path)<=TARGET: return
+            fps = 15 if fps is None else max(5,fps-2)
+            width = 640 if width is None else max(160,int(width*0.8))
+        print("Could not reach target exactly; produced smallest attempted GIF.")

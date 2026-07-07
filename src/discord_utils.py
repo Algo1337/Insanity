@@ -250,7 +250,9 @@ class DiscordUtils():
             f = open(output, "wb")
             f.write(req.content)
             f.close()
+            return 1
         except:
+            print("Error Saving....!")
             return 0
         
         return 1

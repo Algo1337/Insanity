@@ -1,5 +1,9 @@
 import io, os, imageio
+
+import imageio.v3 as iio
 from PIL import Image, ImageSequence
+
+print(__file__)
 
 class Compressor():
     MAX_SIZE: float     = 512 * 1024
@@ -20,7 +24,10 @@ class Compressor():
         print(f"Successfully compressed!")
 
     def compress_png(input_path, temp_path):
-        img = Image.open(input_path)
+    import imageio.v3 as iio
+
+		img = iio.imread(input_path)
+        #img = Image.open(input_path)
         quality = 90
         scale = 1.0
 
@@ -35,7 +42,8 @@ class Compressor():
             scale *= Compressor.RESIZE_STEP  # reduce size
 
     def compress_gif(input_path, temp_path, target_size_kb=512):
-        img = Image.open(input_path)
+        #img = Image.open(input_path)
+        img = iio.imread(input_path)
         
         # Reduce size (scale down)
         scale_factor = 0.8  # start smaller if needed
