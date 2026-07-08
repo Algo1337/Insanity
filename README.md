@@ -28,10 +28,10 @@ nano /cfg/token.cfg
 mkdir assets
 mkdir assets/images
 mkdir assets/yt
-touch assets/admins
+touch assets/admins.log
 touch assets/blacklisted_token.log
 touch assets/blacklist_join.log
-touch assets/deleted
+touch assets/deleted.log
 touch logs
 touch assets/messages.log
 touch assets/skids.log
