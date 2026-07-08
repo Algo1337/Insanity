@@ -19,6 +19,7 @@ pip3 -r modules
 Create ``/cfg/token.cfg`` and add your bot token in it
 
 ```
+mkdir /cfg
 nano /cfg/token.cfg
 ```
 
