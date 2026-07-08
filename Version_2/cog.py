@@ -38,9 +38,10 @@ class Cog:
         self.INVALID_ARGS_ERR = invalid_args_err
 
 class dCog:
-    Commands            : list[Cog]
+    DEFAULT_DIR         : str = "/cmds/"
+    Commands            : list[Cog] = []
     def __init__(self):
-        dCog.retrieve_all_commands("src/cmds/", 0, self.Commands)
+        dCog.retrieve_all_commands(self.DEFAULT_DIR, 0, self.Commands)
     
     @staticmethod
     def retrieve_all_commands(dir: str, inner_dir: int = 0, Cmds: list = None) -> dict:
@@ -78,3 +79,7 @@ class dCog:
 
         return module
         # return getattr(module, object_name) # gets the actual function from file
+
+c: dCog = dCog()
+for command in c.Commands:
+    print(command.name)

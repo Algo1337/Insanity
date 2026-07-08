@@ -1,5 +1,3 @@
 *.pyc
-assets/*
-new_assets/*
-images/*
-cfg/
+/Version_1/assets
+/Version_1/assets
