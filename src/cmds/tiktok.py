@@ -1,6 +1,5 @@
-import shutil, discord, requests as req
+import os, shutil, discord, requests as req
 from time import time
-from pathlib import Path
 
 from src.discord_utils import *
 
@@ -25,17 +24,17 @@ async def tiktok(base, message: DiscordUtils) -> bool:
     d = r["data"]
     title = d.get("title", "vid")
     name = "".join(x for x in title if x.isalnum())[:50] or "vid"
-    path = Path(f"{name}.mp4")
-    if path.exists(): path = Path(f"{name}_{int(time())}.mp4")
+    path = f"{name}.mp4"
+    if os.path.exists(path): path = f"{name}_{int(time())}.mp4"
 
     with req.get(d["play"], stream=True, headers=h) as rx, open(path, "wb") as f:
         shutil.copyfileobj(rx.raw, f)
 
     print(f"[ + ] Saved {path}")
 
-    fname = path.name
+    fname = os.path.basename(path)
     max_bytes = message.Client.guild.filesize_limit
-    size = path.stat().st_size
+    size = os.path.getsize(path)
     if size > max_bytes:
         mb = size // 1024 // 1024
         limit_mb = max_bytes // 1024 // 1024
@@ -43,7 +42,7 @@ async def tiktok(base, message: DiscordUtils) -> bool:
         await message.send_embed("TikTok | Error", f"File too large ({mb}MB > {limit_mb}MB)\n", {
             "**Link**": f"```{d['play']}```"
         }, author_name = "Insanity", author_url = ICON)
-        try: path.unlink()
+        try: os.remove(path)
         except: pass
         return True
 
@@ -55,7 +54,7 @@ async def tiktok(base, message: DiscordUtils) -> bool:
             "**Link**": f"```{d['play']}```"
         }, author_name = "Insanity", author_url = ICON)
 
-    try: path.unlink()
+    try: os.remove(path)
     except: pass
 
     return True

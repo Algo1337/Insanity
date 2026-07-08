@@ -1,5 +1,4 @@
 import os, discord, yt_dlp
-from pathlib import Path
 
 from src.discord_utils import *
 from discord import ChannelType, FFmpegPCMAudio
@@ -70,10 +69,9 @@ async def yt(base, message: DiscordUtils) -> bool:
 
     if opt == "--file":
         output = download_video(url)
-        path = Path(output)
-        fname = path.name
+        fname = os.path.basename(output)
         max_bytes = message.Client.guild.filesize_limit
-        size = path.stat().st_size
+        size = os.path.getsize(output)
         if size > max_bytes:
             mb = size // 1024 // 1024
             limit_mb = max_bytes // 1024 // 1024
@@ -84,7 +82,7 @@ async def yt(base, message: DiscordUtils) -> bool:
             return True
 
         try:
-            await message.Client.channel.send(file = discord.File(path, filename = fname))
+            await message.Client.channel.send(file = discord.File(output, filename = fname))
         except:
             print("[ x ] Error, could not upload file to Discord!\n")
             await message.send_embed("Youtube | Error", "could not upload file to Discord!\n", {
