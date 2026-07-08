@@ -1,4 +1,4 @@
-import os, shutil, discord, requests as req
+import os, shutil, discord, requests
 from time import time
 
 from src.discord_utils import *
@@ -16,7 +16,7 @@ __TIKTOK_INVALID_ARG_ERR__.set_footer(text = "https://insanity.host")
 async def tiktok(base, message: DiscordUtils) -> bool:
     url = message.Args[1]
     h = {"User-Agent": "Mozilla/5.0"}
-    r = req.get(f"https://www.tikwm.com/api/?url={url}", headers=h).json()
+    r = requests.get(f"https://www.tikwm.com/api/?url={url}", headers=h).json()
     if "data" not in r:
         await message.send_embed("TikTok | Error", "bad url", author_name = "Insanity", author_url = ICON)
         return True
@@ -27,7 +27,7 @@ async def tiktok(base, message: DiscordUtils) -> bool:
     path = f"{name}.mp4"
     if os.path.exists(path): path = f"{name}_{int(time())}.mp4"
 
-    with req.get(d["play"], stream=True, headers=h) as rx, open(path, "wb") as f:
+    with requests.get(d["play"], stream=True, headers=h) as rx, open(path, "wb") as f:
         shutil.copyfileobj(rx.raw, f)
 
     print(f"[ + ] Saved {path}")
