@@ -5,6 +5,8 @@ from cog import *
 from utils import *
 
 class Configuration:
+    ServerName          : str = ""
+
     """ Command Prefix """
     Prefix              : str = "+"
 
@@ -15,7 +17,14 @@ class Configuration:
     """ Whitlisted Users """
     Whitlisted          : list = []
     """ Whitlisted Admin """
-    WhitlistedAdmins     : list = []
+    WhitlistedAdmins    : list = []
+
+    """ Log Channel | 1 Channel, All Logs """
+    JoinChannel         : int | str = 0
+    LogChannel          : int | str = 0
+
+    LastMessage         : str = ""
+    LastDeleted         : str = ""
 
     """ Watch VC Attacks """
     WatchVC             : bool = False
@@ -32,11 +41,16 @@ class Insanity(discord.Client):
     OnMessagegDeleted   : Cog
     OnLeave             : Cog
     Config              : Configuration
-    Servers             : dict[int, Configuration] = []
+    Servers             : dict[int, Configuration] = {}
     Cogs                : dCog
     async def on_ready(self,):
         self.Config = Configuration()
-        self.Cogs = dCog  ("/cmds/")
+        self.Config.ServerName = "Skidville"
+
+        self.Servers = {}
+        self.Servers[1441933074697949247] = self.Config
+
+        self.Cogs = dCog()
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity Bot", url = "https://insanity.bot")
@@ -68,6 +82,13 @@ class Insanity(discord.Client):
     async def on_message(self, message):
         if message.author == self.user:
             return
+        
+        if message.guild.id != 1441933074697949247 and message.guild.id not in self.Servers:
+            self.Servers[message.guild.id] = Configuration()
+            self.Servers[message.guild.id].ServerName = message.guild.name
+
+        if message.guild.id in self.Servers:
+            cfg = self.Servers[message.guild.id]
 
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
         
@@ -89,7 +110,7 @@ class Insanity(discord.Client):
                         await message.channel.send(embed = cmd.INVALID_ARGS_ERR)
                         break
 
-                    await message.channel.send(cmd.ArgErr)
+                    await message.channel.send(cmd.INFO["Invalid_Arg_Err"])
                     break
                 else:
                     if cmd.PASS_BASE != None:
@@ -99,10 +120,17 @@ class Insanity(discord.Client):
 
         print(f"{message.content}")
 
+def get_bot_token() -> str:
+    f = open("/cfg/token.cfg", "r")
+    t = f.read()
+    f.close()
+
+    return t
+
 inits = discord.Intents.all()
 inits.message_content = True
 
 print("[ + ] Initializing Insanity bot....!")
 bot = Insanity(intents = inits)
 print("[ + ] Running bot...!")
-bot.run("")
+bot.run(get_bot_token())

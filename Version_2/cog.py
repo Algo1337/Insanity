@@ -18,6 +18,7 @@ class Cog:
     ARG_COUNT           : int = 0                       # Argument Count
     INVALID_ARGS_ERR    : str | discord.Embed = None    # Invalid argument error
     PASS_BASE           : int = 0                       # Pass the discord ctx base
+    INFO                : dict = None
     def __init__(self, name: str, cmd: str, lib, filepath: str, invalid_args_err: str = ""):
         self.NAME = name
         self.COMMAND = cmd
@@ -25,20 +26,30 @@ class Cog:
         if hasattr(self.HANDLE, self.COMMAND):
             self.CMD_HANDLER = getattr(lib, self.COMMAND)
 
-        if hasattr(lib, f"__{self.COMMAND.upper()}_GET_BASE__"):
-            self.PASS_BASE = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_GET_BASE__")
+        if hasattr(lib, f"__{self.COMMAND.upper()}_INFO__"):
+            info: dict = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_INFO__")
+            if "Get_Base" in info:
+                self.PASS_BASE = info["Get_Base"]
+            else: self.PASS_BASE = False
 
-        if hasattr(lib, f"__{self.COMMAND.upper()}_ARG_COUNT__"):
-            self.ARG_COUNT = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_ARG_COUNT__")
+            if "ArgCount" in info:
+                self.ARG_COUNT = info["ArgCount"]
+            else: self.ARG_COUNT = 0
 
-        if hasattr(lib, f"__{self.COMMAND.upper()}_INVALID_ARG_ERR__"):
-            self.INVALID_ARGS_ERR = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_INVALID_ARG_ERR__")
+            if "Invalid_Arg_Err" in info:
+                print(f"Got Err for {self.COMMAND} {info["Invalid_Arg_Err"]}")
+                self.INVALID_ARGS_ERR = info["Invalid_Arg_Err"]
+                print(self.INVALID_ARGS_ERR)
+
+            self.INFO = info
+        else:
+            print(f"Command: '{self.COMMAND}' Missing Info")
 
         self.FILEPATH = filepath
         self.INVALID_ARGS_ERR = invalid_args_err
 
 class dCog:
-    DEFAULT_DIR         : str = "/cmds/"
+    DEFAULT_DIR         : str = "/cmds"
     Commands            : list[Cog] = []
     def __init__(self, dir_path: str = None):
         if dir_path:
@@ -59,6 +70,7 @@ class dCog:
         for item in dir_list:
             if item.endswith(".py"):
                 Files[item] = f"{CURRENT_DIR}/{item}"
+                print(Files[item])
                 name = item.replace(".py", "")
                 Cmds.append(Cog(name, name, dCog.load_object_from_file(f"{name}_cmd", f"{CURRENT_DIR}/{item}", name), f"{CURRENT_DIR}/{item}"))
 
