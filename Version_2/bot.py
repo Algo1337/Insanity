@@ -1,30 +1,44 @@
 import discord
 
+from cog import *
+from utils import *
+
+class Configuration:
+    """ Command Prefix """
+    Prefix              : str = "+"
+
+    """ Users Blacklisted """
+    BlacklistedSkids    : list = []
+    """ Blacklisted Tokens """
+    BlacklistedTokens   : list = []
+    """ Whitlisted Users """
+    Whitlisted          : list = []
+    """ Whitlisted Admin """
+    WhitlistedAdmins     : list = []
+
+    """ Watch VC Attacks """
+    WatchVC             : bool = False
+    CurrentVC           : str = ""
+    CurrentRegion       : str = ""
+    LastRegion          : str = ""          # Ensure watcher does not use the last region again
+
+    LastMessage         : str = ""
+    LastDeleted         : str = ""
+
 class Insanity(discord.Client):
-    AVAILABLE_REGIONS:  list[str] = [           # Available Regions
-        'us-west',
-        'us-east',
-        'us-central',
-        'us-south',
-        'singapore',
-        'japan',
-        'hongkong',
-        'brazil',
-        'sydney',
-        'southafrica',
-        'india',
-        'rotterdam',
-        'russia',
-        'europe',
-        'frankfurt',
-        'london',
-        'dubai'
-    ]
-    
-    async def on_ready(self):
+    OnJoin              : Cog
+    OnMessage           : Cog
+    OnMessagegDeleted   : Cog
+    OnLeave             : Cog
+    Config              : Configuration
+    Servers             : dict[int, Configuration] = []
+    Cogs                : dCog
+    async def on_ready(self,):
+        self.Config = Configuration()
+        self.Cogs = dCog  ("/cmds/")
         await self.change_presence(
             status = discord.Status.dnd,
-            activity = discord.Streaming(name = "Insanity API", url = "https://insanity.bot")
+            activity = discord.Streaming(name = "Insanity Bot", url = "https://insanity.bot")
         )
 
         print(f"[ + ] Firing up {self.user}....!")
@@ -51,8 +65,37 @@ class Insanity(discord.Client):
         pass
 
     async def on_message(self, message):
-        if message.content == "+help":
-            await message.channel.send("Insanity V2.0; Hello")
+        if message.author == self.user:
+            return
+
+        msg = DiscordUtils(self, message, Discord_Event_T.e_message)
+        
+        for cmd in self.Cogs.Commands:
+            if cmd.NAME.startswith("__"):
+                continue
+            
+            if f"{self.Config.Prefix}{cmd.NAME}" == msg.Cmd and cmd.ARG_COUNT == 0:
+                if cmd.PASS_BASE != False and cmd.PASS_BASE != None:
+                    await cmd.CMD_HANDLER(self, msg)
+                else:
+                    await cmd.CMD_HANDLER(msg)
+
+                break
+
+            if f"{self.Config.Prefix}{cmd.NAME}" == msg.Cmd:
+                if cmd.ARG_COUNT > 0 and msg.Args.__len__() < cmd.ARG_COUNT:
+                    if isinstance(cmd.INVALID_ARGS_ERR, discord.Embed):
+                        await message.channel.send(embed = cmd.INVALID_ARGS_ERR)
+                        break
+
+                    await message.channel.send(cmd.ArgErr)
+                    break
+                else:
+                    if cmd.PASS_BASE != None:
+                        await cmd.CMD_HANDLER(self, msg)
+                    else:
+                        await cmd.CMD_HANDLER(msg)
+
         print(f"{message.content}")
 
 inits = discord.Intents.all()

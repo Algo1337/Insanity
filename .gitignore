@@ -1,3 +1,4 @@
 *.pyc
 /Version_1/assets
 /Version_1/assets
+assets/*

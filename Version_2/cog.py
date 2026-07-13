@@ -22,17 +22,17 @@ class Cog:
         self.NAME = name
         self.COMMAND = cmd
         self.HANDLE = lib
-        if hasattr(self.lib, self.cmd):
+        if hasattr(self.HANDLE, self.COMMAND):
             self.CMD_HANDLER = getattr(lib, self.COMMAND)
 
         if hasattr(lib, f"__{self.COMMAND.upper()}_GET_BASE__"):
-            self.PASS_BASE = getattr(self.lib, f"__{self.COMMAND.upper()}_GET_BASE__")
+            self.PASS_BASE = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_GET_BASE__")
 
         if hasattr(lib, f"__{self.COMMAND.upper()}_ARG_COUNT__"):
-            self.ARG_COUNT = getattr(self.lib, f"__{self.COMMAND.upper()}_ARG_COUNT__")
+            self.ARG_COUNT = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_ARG_COUNT__")
 
         if hasattr(lib, f"__{self.COMMAND.upper()}_INVALID_ARG_ERR__"):
-            self.INVALID_ARGS_ERR = getattr(self.lib, f"__{self.COMMAND.upper()}_INVALID_ARG_ERR__")
+            self.INVALID_ARGS_ERR = getattr(self.HANDLE, f"__{self.COMMAND.upper()}_INVALID_ARG_ERR__")
 
         self.FILEPATH = filepath
         self.INVALID_ARGS_ERR = invalid_args_err
@@ -40,7 +40,10 @@ class Cog:
 class dCog:
     DEFAULT_DIR         : str = "/cmds/"
     Commands            : list[Cog] = []
-    def __init__(self):
+    def __init__(self, dir_path: str = None):
+        if dir_path:
+            self.DEFAULT_DIR = dir_path
+
         dCog.retrieve_all_commands(self.DEFAULT_DIR, 0, self.Commands)
     
     @staticmethod
@@ -79,7 +82,3 @@ class dCog:
 
         return module
         # return getattr(module, object_name) # gets the actual function from file
-
-c: dCog = dCog()
-for command in c.Commands:
-    print(command.name)
