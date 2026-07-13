@@ -3,6 +3,10 @@
     <p>A Multi-purpose discord bot</p>
 </div>
 
+# [NEW] Insanity Version: 2.0
+
+Currently @ early development
+
 # Install
 
 - Debian/Ubuntu
