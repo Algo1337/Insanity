@@ -37,13 +37,12 @@ class Cog:
             else: self.ARG_COUNT = 0
 
             if "Invalid_Arg_Err" in info:
-                print(f"Got Err for {self.COMMAND} {info["Invalid_Arg_Err"]}")
                 self.INVALID_ARGS_ERR = info["Invalid_Arg_Err"]
-                print(self.INVALID_ARGS_ERR)
 
             self.INFO = info
         else:
-            print(f"Command: '{self.COMMAND}' Missing Info")
+            print(f"| '{self.COMMAND}' Missing Info", end = " ")
+        print("")
 
         self.FILEPATH = filepath
         self.INVALID_ARGS_ERR = invalid_args_err
@@ -70,7 +69,7 @@ class dCog:
         for item in dir_list:
             if item.endswith(".py"):
                 Files[item] = f"{CURRENT_DIR}/{item}"
-                print(Files[item])
+                print(f"Loading Command: {Files[item]}", end = " ")
                 name = item.replace(".py", "")
                 Cmds.append(Cog(name, name, dCog.load_object_from_file(f"{name}_cmd", f"{CURRENT_DIR}/{item}", name), f"{CURRENT_DIR}/{item}"))
 

@@ -21,13 +21,7 @@ class db_t(enum.Enum):
     __BLACKLISTED_TOKENS_PATH__ : str = "assets/blacklisted_token.log"
     __ADMINS_PATH__             : str = "assets/admins.log"
 
-"""
-local_tz = pytz.timezone('America/Kentucky/Louisville')
-timestamp = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
-print(f"[ MESSAGE: {timestamp} ]: \x1b[33m{message.Client.id}\x1b[39m | \x1b[31m{message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id}\x1b[0m | \x1b[32m{message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')}\x1b[0m \x1b[33m{message.Client.author.display_name}:{message.Client.author.name}\x1b[0m: {message.Client.content}")
-f"[ MESSAGE: {timestamp} ]: {message.Client.id} | {message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id} | {message.Client.author.display_name}:{message.Client.author.name}: {message.Client.content}"):
-    print("[ x ] Error, Failed to log message to file!\n")
-"""
+
 def log(action: action_t, data: str) -> bool:
     local_tz = pytz.timezone('America/Kentucky/Louisville')
     timestamp = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')

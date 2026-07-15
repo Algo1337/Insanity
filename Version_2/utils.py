@@ -2,14 +2,6 @@ import discord, enum, requests, asyncio, pytz
 
 from datetime import datetime
 
-class action_t(enum.Enum):
-    ON_MESSAGE            = 0
-    ON_MESSAGE_DELETE     = 1
-    ON_JOIN               = 2
-    ADMIN_ACTION          = 3
-    ON_VC_JOIN            = 4
-    ON_REMOVE             = 5
-
 class Discord_Event_T(enum.Enum):
     e_none              = 0
     e_joined            = 1
@@ -18,6 +10,17 @@ class Discord_Event_T(enum.Enum):
     e_message_del       = 4,
     e_vc                = 5,
     e_kick              = 6
+
+class op_t(enum.Enum):
+    __read_db__ = "read"
+    __add_id__ = "add"
+    __rm_id__ = "rm"
+
+class db_t(enum.Enum):
+    __SKIDS_PATH__              : str = "assets/skids.log"
+    __BLACKLIST_JOIN_PATH__     : str = "assets/blacklist_join.log"
+    __BLACKLISTED_TOKENS_PATH__ : str = "assets/blacklisted_token.log"
+    __ADMINS_PATH__             : str = "assets/admins.log"
 
 class DiscordUtils():
     Cmd         : str = ""
@@ -58,7 +61,8 @@ class DiscordUtils():
         self.Redirect = True
         self.rChannel = chan
 
-    async def log(self, action: action_t, data: str, fields: dict[str, str] = None) -> None:
+    """ Log to discord channel """
+    async def log(self, action: Discord_Event_T, data: str, fields: dict[str, str] = None) -> None:
         local_tz = pytz.timezone('America/Kentucky/Louisville')
         
         if self.Client_T == Discord_Event_T.e_message or self.Client_T == Discord_Event_T.e_message_del:
@@ -263,3 +267,37 @@ class DiscordUtils():
             return 0
         
         return 1
+
+    @staticmethod
+    def database(db: db_t, op: op_t, query: int | str) -> bool | str:
+        if op == op_t.__read_db__:
+            """ Read Database """
+            file = open(db, "r")
+            data = file.read().split("\n")
+            file.close()
+
+            return data
+        elif op == op_t.__add_id__:
+            """ Add Query to File """
+            file = open(db, "a")
+            file.write(f"{query}\n")
+            file.close()
+
+            return True
+        elif op == op_t.__rm_id__:
+            """ Remove Query from file """
+            lines: list[str] = []
+            file = open(db, "r")
+            data = file.read().split("\n")
+            for line in data:
+                if query not in line:
+                    lines.append(line)
+
+            file.close()
+            file = open(db, "w")
+            file.write("\n".join(lines))
+            file.close()
+
+            return True
+        
+        return False

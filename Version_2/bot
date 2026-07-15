@@ -23,17 +23,14 @@ class Configuration:
     JoinChannel         : int | str = 0
     LogChannel          : int | str = 0
 
-    LastMessage         : str = ""
-    LastDeleted         : str = ""
+    LastMessage         : DiscordUtils = None
+    LastDeleted         : DiscordUtils = None
 
     """ Watch VC Attacks """
     WatchVC             : bool = False
     CurrentVC           : str = ""
     CurrentRegion       : str = ""
     LastRegion          : str = ""          # Ensure watcher does not use the last region again
-
-    LastMessage         : str = ""
-    LastDeleted         : str = ""
 
 class Insanity(discord.Client):
     OnJoin              : Cog
@@ -43,6 +40,9 @@ class Insanity(discord.Client):
     Config              : Configuration
     Servers             : dict[int, Configuration] = {}
     Cogs                : dCog
+    CreatorServerID     : int = 1441933074697949247
+    CreatorLogID        : int = 1442206176766070946
+    CreatorMemeID       : int = 1526921007473098893
     async def on_ready(self):
         self.Config = Configuration()
         self.Config.ServerName = "Skidville"
@@ -52,8 +52,9 @@ class Insanity(discord.Client):
 
         self.Cogs = dCog()
         for cog in self.Cogs.Commands:
-            if cog.NAME == "__on_message__":
-                self.OnMessage = cog
+            if cog.NAME == "__on_message__": self.OnMessage = cog
+            elif cog.NAME == "__on_message_delete__": self.OnMessagegDeleted = cog
+            elif cog.NAME == "__on_join__": self.OnJoin = cog
 
         await self.change_presence(
             status = discord.Status.dnd,
@@ -72,7 +73,15 @@ class Insanity(discord.Client):
         print(f"[ + ] Join {guild.id}")
         
     async def on_member_join(self, member):
-        pass
+        msg = DiscordUtils(self, member, Discord_Event_T.e_joined)
+        if self.OnJoin:
+            if self.OnJoin.SendBase:
+                if (await self.OnJoin.handler(self, msg)) == False:
+                    return
+                
+            else:
+                if (await self.OnJoin.handler(msg)) == False:
+                    return
 
     """
         [ On Message Delete ]
