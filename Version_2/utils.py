@@ -64,6 +64,7 @@ class DiscordUtils():
     """ Log to discord channel """
     async def log(self, action: Discord_Event_T, data: str, fields: dict[str, str] = None) -> None:
         local_tz = pytz.timezone('America/Kentucky/Louisville')
+        timestamp = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
         
         if self.Client_T == Discord_Event_T.e_message or self.Client_T == Discord_Event_T.e_message_del:
             timestamp = self.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')

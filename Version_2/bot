@@ -48,7 +48,7 @@ class Insanity(discord.Client):
         self.Config.ServerName = "Skidville"
 
         self.Servers = {}
-        self.Servers[1441933074697949247] = self.Config
+        self.Servers[self.CreatorServerID] = self.Config
 
         self.Cogs = dCog()
         for cog in self.Cogs.Commands:
@@ -75,12 +75,12 @@ class Insanity(discord.Client):
     async def on_member_join(self, member):
         msg = DiscordUtils(self, member, Discord_Event_T.e_joined)
         if self.OnJoin:
-            if self.OnJoin.SendBase:
-                if (await self.OnJoin.handler(self, msg)) == False:
+            if self.OnJoin.PASS_BASE:
+                if (await self.OnJoin.CMD_HANDLER(self, msg)) == False:
                     return
                 
             else:
-                if (await self.OnJoin.handler(msg)) == False:
+                if (await self.OnJoin.CMD_HANDLER(msg)) == False:
                     return
 
     """
@@ -97,7 +97,7 @@ class Insanity(discord.Client):
             return
         
         """ Check for Server Config Or Add One """
-        if message.guild.id != 1441933074697949247 and message.guild.id not in self.Servers:
+        if message.guild.id != self.CreatorServerID and message.guild.id not in self.Servers:
             self.Servers[message.guild.id] = Configuration()
             self.Servers[message.guild.id].ServerName = message.guild.name
 

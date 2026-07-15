@@ -59,7 +59,7 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
 
     """ Message Log """
     local_tz = pytz.timezone('America/Kentucky/Louisville')
-    timestamp = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
+    timestamp = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y-%H:%M:%S')
     msg_id = message.Client.id
     server_name = message.Client.guild.name
     server_id = message.Client.guild.id
@@ -68,7 +68,7 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     display_name = message.Client.author.display_name
     username = message.Client.author.name
     userid = message.Client.author.id
-    created_at = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
+    created_at = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y-%H:%M:%S')
 
     print(f"\x1b[35m[MESSAGE: {timestamp}]\x1b[39m: {msg_id} | {server_name}({server_id}) - {channel_name}({channel_id})\n\x1b[32m{username}({userid}) - {display_name}: {message.Client.content}\x1b[39m")
 
