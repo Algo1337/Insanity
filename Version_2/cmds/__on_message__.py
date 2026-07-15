@@ -54,7 +54,18 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
 
     local_tz = pytz.timezone('America/Kentucky/Louisville')
     timestamp = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
-    print(f"[ MESSAGE: {timestamp} ]: \x1b[33m{message.Client.id}\x1b[39m | \x1b[31m{message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id}\x1b[0m | \x1b[32m{message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')}\x1b[0m \x1b[33m{message.Client.author.display_name}:{message.Client.author.name}\x1b[0m: {message.Client.content}")
+    msg_id = message.Client.id
+    server_name = message.Client.guild.name
+    server_id = message.Client.guild.id
+    channel_name = message.Client.channel.name
+    channel_id = message.Client.channel.id
+    display_name = message.Client.author.display_name
+    username = message.Client.author.name
+    userid = message.Client.author.id
+    created_at = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
+
+    print(f"\x1b[35m[MESSAGE: {timestamp}]\x1b[39m: {msg_id} | {server_name}({server_id}) - {channel_name}({channel_id})\n\x1b[32m{username}({userid}) - {display_name}: {message.Client.content}\x1b[39m")
+    # print(f"[ MESSAGE: {timestamp} ]: \x1b[33m{message.Client.id}\x1b[39m | \x1b[31m{message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id}\x1b[0m | \x1b[32m{message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')}\x1b[0m \x1b[33m{message.Client.author.display_name}:{message.Client.author.name}\x1b[0m: {message.Client.content}")
     
     # if not append_to_logs(f"[ MESSAGE: {timestamp} ]: {message.Client.id} | {message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id} | {message.Client.author.display_name}:{message.Client.author.name}: {message.Client.content}"):
     #     print("[ x ] Error, Failed to log message to file!\n")
