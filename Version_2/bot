@@ -87,15 +87,19 @@ class Insanity(discord.Client):
         if message.author == self.user:
             return
         
+        """ Check for Server Config Or Add One """
         if message.guild.id != 1441933074697949247 and message.guild.id not in self.Servers:
             self.Servers[message.guild.id] = Configuration()
             self.Servers[message.guild.id].ServerName = message.guild.name
 
+        """ Load Server Config """
         if message.guild.id in self.Servers:
             cfg = self.Servers[message.guild.id]
 
+        """ Message Info """
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
         
+        """ dCog OnMessage Handler """
         if self.OnMessage:
             if self.OnMessage.PASS_BASE:
                 if (await self.OnMessage.CMD_HANDLER(self, msg)) == False:
@@ -105,6 +109,7 @@ class Insanity(discord.Client):
                 if (await self.OnMessage.CMD_HANDLER(msg)) == False:
                     return
                 
+        """ dCog Command Handler """
         for cmd in self.Cogs.Commands:
             if cmd.NAME.startswith("__"):
                 continue
@@ -130,8 +135,6 @@ class Insanity(discord.Client):
                         await cmd.CMD_HANDLER(self, msg)
                     else:
                         await cmd.CMD_HANDLER(msg)
-
-        print(f"{message.content}")
     
     def find_server_config(self, server_q: int | str) -> Configuration:
         for server in self.Servers:
