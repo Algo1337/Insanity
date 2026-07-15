@@ -3,19 +3,9 @@ import discord, pytz
 from datetime import datetime, timezone
 from utils import *
 
-____ON_MESSAGE_DELETE___GET_BASE__ = True
-
-def append_to_logs(msg: str) -> bool:
-    if not msg or msg == "":
-        return False
-    
-    try:
-        fd = open("assets/deleted.log", "a+")
-        fd.write(f"{msg}\n")
-        fd.close()
-        return True
-    except:
-        return False
+____ON_MESSAGE_DELETE___INFO__ = {
+    "Get_Base": True
+}
     
 async def __on_message_delete__(base, message: DiscordUtils) -> bool:
     server = base.find_server_config(message.Client.guild.id)
@@ -23,8 +13,7 @@ async def __on_message_delete__(base, message: DiscordUtils) -> bool:
         return
     
     """ Command Check """
-    if not message.Client.content.startswith(server.Prefix):
-        print("ADDED")
+    if message.Client.content.startswith(server.Prefix) == False:
         server.LastDeleted = message
 
     """ Message Log """
@@ -39,9 +28,9 @@ async def __on_message_delete__(base, message: DiscordUtils) -> bool:
     username = message.Client.author.name
     userid = message.Client.author.id
     created_at = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
+    print(f"\x1b[35m[DELETED MESSAGE: {timestamp}]\x1b[39m: {msg_id} | {server_name}({server_id}) - {channel_name}({channel_id})\n\x1b[32m{username}({userid}) - {display_name}: {message.Client.content}\x1b[39m")
 
-    print(f"\x1b[35m[MESSAGE: {timestamp}]\x1b[39m: {msg_id} | {server_name}({server_id}) - {channel_name}({channel_id})\n\x1b[32m{username}({userid}) - {display_name}: {message.Client.content}\x1b[39m")
-
+    """ Log Delete """
     channel = discord.utils.get(message.Client.guild.text_channels, name = "logs")
     if channel:
         await channel.send(embed = discord.Embed(title = f"Logs | Message Deleted", description = f"<@{message.Client.author.id}> has deleted their message!\n\nMessage:```{message.Client.content}```", colour = discord.Colour.red()))

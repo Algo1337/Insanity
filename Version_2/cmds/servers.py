@@ -26,8 +26,7 @@ async def servers(base, message: DiscordUtils) -> bool:
     )
 
     for guild in base.guilds:
-        if guild.id in base.Servers:
-            embed.add_field(name = guild.name, value = f"{guild.id} | {guild.member_count} Members", inline = False)
+        embed.add_field(name = guild.name, value = f"{guild.id} | {guild.member_count} Members", inline = False)
 
     await message.Client.channel.send(embed = embed)
     return True

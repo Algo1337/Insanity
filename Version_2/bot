@@ -35,7 +35,7 @@ class Configuration:
 class Insanity(discord.Client):
     OnJoin              : Cog
     OnMessage           : Cog
-    OnMessagegDeleted   : Cog
+    OnMessageDeleted    : Cog
     OnLeave             : Cog
     Config              : Configuration
     Servers             : dict[int, Configuration] = {}
@@ -53,7 +53,7 @@ class Insanity(discord.Client):
         self.Cogs = dCog()
         for cog in self.Cogs.Commands:
             if cog.NAME == "__on_message__": self.OnMessage = cog
-            elif cog.NAME == "__on_message_delete__": self.OnMessagegDeleted = cog
+            elif cog.NAME == "__on_message_delete__": self.OnMessageDeleted = cog
             elif cog.NAME == "__on_join__": self.OnJoin = cog
 
         await self.change_presence(
@@ -87,7 +87,17 @@ class Insanity(discord.Client):
         [ On Message Delete ]
     """
     async def on_message_delete(self, message):
-        pass
+        msg = DiscordUtils(self, message, Discord_Event_T.e_message_del)
+        msg.set_log_channel(1429855130081165364)
+
+        if self.OnMessageDeleted:
+            if self.OnMessageDeleted.PASS_BASE:
+                if (await self.OnMessageDeleted.CMD_HANDLER(self, msg)) == False:
+                    return
+                
+            else:
+                if (await self.OnMessageDeleted.CMD_HANDLER(msg)) == False:
+                    return
                 
     async def on_member_remove(self, member):
         pass

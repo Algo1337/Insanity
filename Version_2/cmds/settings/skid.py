@@ -4,7 +4,7 @@ from utils import *
 
 __SKID_INFO__ = {
     "Name": "skid",
-    "Description": "",
+    "Description": "Blacklist a skid",
     "ArgCount": 3,
     "Invalid_Arg_Err": "Invalid arguments",
     "Get_Base": True

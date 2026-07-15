@@ -3,6 +3,8 @@ import discord
 from utils import *
 
 __DELETED_INFO__ = {
+    "Name": "Deleted",
+    "Description": "Display the last deleted message",
     "Get_Base": True
 }
 
