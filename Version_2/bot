@@ -43,7 +43,7 @@ class Insanity(discord.Client):
     Config              : Configuration
     Servers             : dict[int, Configuration] = {}
     Cogs                : dCog
-    async def on_ready(self,):
+    async def on_ready(self):
         self.Config = Configuration()
         self.Config.ServerName = "Skidville"
 
@@ -51,6 +51,10 @@ class Insanity(discord.Client):
         self.Servers[1441933074697949247] = self.Config
 
         self.Cogs = dCog()
+        for cog in self.Cogs.Commands:
+            if cog.NAME == "__on_message__":
+                self.OnMessage = cog
+
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity Bot", url = "https://insanity.bot")
@@ -92,6 +96,15 @@ class Insanity(discord.Client):
 
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
         
+        if self.OnMessage:
+            if self.OnMessage.PASS_BASE:
+                if (await self.OnMessage.CMD_HANDLER(self, msg)) == False:
+                    return
+                
+            else:
+                if (await self.OnMessage.CMD_HANDLER(msg)) == False:
+                    return
+                
         for cmd in self.Cogs.Commands:
             if cmd.NAME.startswith("__"):
                 continue
@@ -119,6 +132,16 @@ class Insanity(discord.Client):
                         await cmd.CMD_HANDLER(msg)
 
         print(f"{message.content}")
+    
+    def find_server_config(self, server_q: int | str) -> Configuration:
+        for server in self.Servers:
+            if isinstance(server_q, int) and server == server_q:
+                return self.Servers[server]
+            
+            if isinstance(server_q, str) and server == self.Servers[server].ServerName:
+                return self.Servers[server]
+            
+        return None
 
 def get_bot_token() -> str:
     f = open("/cfg/token.cfg", "r")

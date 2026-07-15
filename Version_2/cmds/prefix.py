@@ -11,4 +11,5 @@ __PREFIX_INFO__ = {
 }
 
 async def prefix(base, message: DiscordUtils):
-    base.Servers[message.Client.guild.id].Prefix = message.Args[1]
+    if message.Args >= 2:
+        base.Servers[message.Client.guild.id].Prefix = message.Args[1]
