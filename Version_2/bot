@@ -57,7 +57,7 @@ class Insanity(discord.Client):
             elif cog.NAME == "__on_join__": self.OnJoin = cog
 
         await self.change_presence(
-            status = discord.Status.away,
+            status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity Bot", url = "https://insanity.bot")
         )
 
