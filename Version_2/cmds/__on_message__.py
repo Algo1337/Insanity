@@ -7,21 +7,6 @@ ____ON_MESSAGE___INFO__ = {
     "Get_Base": True
 }
 
-""" 
-    TODO; Implement a new logger
-"""
-# def append_to_logs(msg: str) -> bool:
-#     if not msg or msg == "":
-#         return False
-    
-#     try:
-#         fd = open("assets/messages.log", "a+")
-#         fd.write(f"{msg}\n")
-#         fd.close()
-#         return True
-#     except:
-#         return False
-
 async def blacklisted_token_check(msg: DiscordUtils, blacklisted_token: list[str]) -> tuple[bool, str]:
     msg_args = msg.Client.content.split(" ")
     for token in blacklisted_token:
