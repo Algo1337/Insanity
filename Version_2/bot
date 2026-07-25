@@ -43,6 +43,25 @@ class Insanity(discord.Client):
     CreatorServerID     : int = 1441933074697949247
     CreatorLogID        : int = 1442206176766070946
     CreatorMemeID       : int = 1526921007473098893
+    AvailableRegions    :  list[str] = [           # Available Regions
+            'us-west',
+            'us-east',
+            'us-central',
+            'us-south',
+            'singapore',
+            'japan',
+            'hongkong',
+            'brazil',
+            'sydney',
+            'southafrica',
+            'india',
+            'rotterdam',
+            'russia',
+            'europe',
+            'frankfurt',
+            'london',
+            'dubai'
+        ]
     async def on_ready(self):
         self.Config = Configuration()
         self.Config.ServerName = "Skidville"
