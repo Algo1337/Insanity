@@ -4,6 +4,7 @@ import discord
 
 from src.config import *
 from src.discord_utils import *
+from google import genai
 
 COMMANDS_DIR = "/src/cmds"
 
@@ -79,23 +80,19 @@ class Insanity(discord.Client, Config):
     LastMessage:        DiscordUtils = None     # Last Message
     LastDeleted:        DiscordUtils = None     # Last Deleted Message
     AVAILABLE_REGIONS:  list[str] = [           # Available Regions
-        'us-west',
-        'us-east',
+        # 'brazil',
+        # 'hongkong',
+        # 'india',
+        # 'japan',
+        # 'rotterdam',
+        # 'singapore',
+        # 'south-korea',
+        # 'southafrica',
+        # 'sydney',
         'us-central',
+        'us-east',
         'us-south',
-        'singapore',
-        'japan',
-        'hongkong',
-        'brazil',
-        'sydney',
-        'southafrica',
-        'india',
-        'rotterdam',
-        'russia',
-        'europe',
-        'frankfurt',
-        'london',
-        'dubai'
+        'us-west'
     ]
 
     """
@@ -118,7 +115,7 @@ class Insanity(discord.Client, Config):
         self.Blacklistjoin.pop(len(self.Blacklistjoin) - 1)
         await self.change_presence(
             status = discord.Status.dnd,
-            activity = discord.Streaming(name = "Insanity API", url = "https://insanity.bot")
+            activity = discord.Streaming(name = "Always Logging", url = "https://insanity.bot")
         )
 
         print(f"[ + ] Firing up {self.user}....!")
@@ -187,16 +184,56 @@ class Insanity(discord.Client, Config):
                 
                 break
 
+    async def on_reaction_add(self, reaction, user):
+        await reaction.message.add_reaction(reaction.emoji)
+
+    async def on_reaction_remove(self, reaction, user):
+        if user.bot:
+            return
+        
+        if user.id != 1543694981598814251 and user.id != 1521597237468205146:
+            return
+        
+        for reactor in reaction.message.reactions:
+            if reactor.emoji == reaction.emoji:
+                users = [u async for u in reactor.users()]
+                if bot.user in users:
+                    await reaction.remove(bot.user)
+                break
+
     async def on_message(self, message):
         if message.author == self.user:
+            return
+
+        if message.contentz and message.content.startswith(".fc"):
+            print("TRYING")
+            target = message.content.replace(".fc ", "")
+            if message.reference and message.reference.message_id:
+                target_message = await message.channel.fetch_message(
+                    message.reference.message_id
+                )
+                target = target_message.content
+
+            client = genai.Client(api_key="AIzaSyAaRnav3DNdEhWlNcc4CO1dpcaZ6OzYChs")
+            response = client.interactions.create(
+                model="gemini-3.5-flash",
+                input=f"Fact-check, Is this true!?: {target}",
+                generation_config={
+                    "max_output_tokens": 1500
+                }
+            )
+
+            if len(response.output_text) > 2000:
+                for i in range(0, len(response.output_text)):
+                    await message.channel.send(response.output_text[i:i + 1900])
+                    i += 1900
+            else:
+                await message.channel.send(response.output_text[:1500])
             return
         
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
         msg.set_log_channel(1429855130081165364)
         
-        if message.content.startswith(Config.PREFIX):
-            await msg.log(action_t.ON_MESSAGE, "")
-
         if "--nostdin" in msg.Args:
             msg.Args.remove("--nostdin")
             msg.Data = msg.Data.replace("--nostdin", "")
@@ -205,10 +242,20 @@ class Insanity(discord.Client, Config):
         if "--redirect" in msg.Args:
             channel_value, i = msg.get_flag_value("--redirect")
             print(f"Channel {msg.Args[i + 1]}")
-            msg.set_redirect_channel(int(msg.Args[i + 1]))
+            
+            channel = self.get_channel(int(msg.Args[i + 1]))
             msg.Data = msg.Data.replace(f"{msg.Args[i + 1]}", "").replace("--redirect ", "")
-            msg.Args.pop(len(msg.Args) - 1)
-            msg.Args.pop(len(msg.Args) - 1)
+            msg.Args.pop(i)
+            msg.Args.pop(i)
+
+            await channel.send(
+                content=msg.Data,
+                embeds=message.embeds,
+                files=[await a.to_file() for a in message.attachments]
+            )
+
+        if message.content.startswith(Config.PREFIX):
+            await msg.log(action_t.ON_MESSAGE, "")
 
         if self.OnMessage:
             if self.OnMessage.SendBase:
@@ -256,5 +303,6 @@ inits.message_content = True
 
 print("[ + ] Initializing Insanity bot....!")
 bot = Insanity(intents = inits, Config = Config())
+# bot = Insanity(Config = Config())
 print("[ + ] Running bot...!")
 bot.run(get_bot_token())

@@ -208,7 +208,10 @@ class DiscordUtils():
         if image != None:
             embed.set_image(url = image)
 
-        await self.Client.channel.send(embed = embed)
+        try:
+            await self.Client.channel.send(embed = embed)
+        except:
+            await self.send_message(f"{title}\n\n{desc}")
 
     def get_emojis(self, data: str = None) -> list:
         emojis = []
