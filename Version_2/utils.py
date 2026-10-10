@@ -1,6 +1,6 @@
 import discord, enum, requests, asyncio, pytz
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 class Discord_Event_T(enum.Enum):
     e_none              = 0
@@ -33,7 +33,7 @@ class DiscordUtils():
     Redirect    : bool = False
     rChannel    : str | int = None
     Client_T    : Discord_Event_T = Discord_Event_T.e_none
-    LogChannel  : int = 1442206176766070946
+    LogChannel  : int = None
     def __init__(self, dClient, message, event_t: Discord_Event_T):
         self.dClient = dClient
         self.Client_T = event_t
@@ -63,19 +63,30 @@ class DiscordUtils():
 
     """ Log to discord channel """
     async def log(self, action: Discord_Event_T, data: str, fields: dict[str, str] = None) -> None:
+        if self.LogChannel == None:
+            return
+    
         local_tz = pytz.timezone('America/Kentucky/Louisville')
         timestamp = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
         
         if self.Client_T == Discord_Event_T.e_message or self.Client_T == Discord_Event_T.e_message_del:
-            timestamp = self.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y %H:%M:%S')
+            timestamp = self.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y-%H:%M:%S')
         else:
             timestamp = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S")
 
         channel = self.dClient.get_channel(self.LogChannel)
 
         embed = discord.Embed(title = "Insanity Logs", description = f"New Log!\n\n{data}", color = discord.Colour.red())
-        embed.add_field(name = "Timestamp", value = f"{timestamp}", inline = True)
         embed.add_field(name = "Action", value = action.name, inline = True)
+        embed.add_field(name = "Timestamp", value = f"{timestamp}", inline = True)
+        
+        if fields != None:
+            for field in fields:
+                if isinstance(fields[field], list):
+                    embed.add_field(name = field, value = fields[field][0], inline = fields[field][1])
+                else:
+                    embed.add_field(name = field, value = fields[field], inline = False)
+
         if hasattr(self.Client, "content"):
             if "```" in self.Client.content:
                 embed.add_field(name = "Message", value = self.Client.content, inline = False)
@@ -88,27 +99,10 @@ class DiscordUtils():
             print("[ x ] Error, Unable to get log channel!")
             return
         
-        if fields != None:
-            for field in fields:
-                if isinstance(fields[field], list):
-                    embed.add_field(name = field, value = fields[field][0], inline = fields[field][1])
-                else:
-                    embed.add_field(name = field, value = fields[field], inline = False)
-        
         await channel.send(embed = embed)
 
     def get_arg(self, pos: int) -> str:
         return self.Args[pos]
-    
-    def get_flag_value(self, flag: str) -> str | None:
-        i = 0
-        for arg in self.Args:
-            if arg == flag:
-                return self.Args[i + 1]
-            
-            i += 1
-
-        return None
 
     async def redirect_message(self, text: str, file = None, files = None) -> bool:
         if not text or text == "":
@@ -302,3 +296,10 @@ class DiscordUtils():
             return True
         
         return False
+
+    def get_bot_token() -> str:
+        f = open("/cfg/token.cfg", "r")
+        t = f.read()
+        f.close()
+
+        return t

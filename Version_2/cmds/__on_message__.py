@@ -55,7 +55,11 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     userid = message.Client.author.id
     created_at = message.Client.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y-%H:%M:%S')
 
-    print(f"\x1b[35m[MESSAGE: {timestamp}]\x1b[39m: {msg_id} | {server_name}({server_id}) - {channel_name}({channel_id})\n\x1b[32m{username}({userid}) - {display_name}: {message.Client.content}\x1b[39m")
+    print(
+        f"\x1b[32m[MESSAGE: {timestamp}]\x1b[39m: {msg_id} | "
+        f"{server_name}({server_id}) - {channel_name}({channel_id})\n"
+        f"\x1b[35m{username}({userid}) | {created_at} - {display_name}: {message.Client.content}\x1b[39m"
+    )
 
     """ TODO; Implement a logger """
     # if not append_to_logs(f"[ MESSAGE: {timestamp} ]: {message.Client.id} | {message.Client.guild.name}-{message.Client.guild.id}/{message.Client.channel.name}-{message.Client.channel.id} | {message.Client.author.display_name}:{message.Client.author.name}: {message.Client.content}"):
@@ -65,6 +69,12 @@ async def __on_message__(base, message: DiscordUtils) -> bool:
     ckh, string = (await blacklisted_token_check(message, server.BlacklistedTokens))
     if  ckh and f"{message.Client.author.id}" not in server.Whitlisted:
         # await message.log(action_t.ON_MESSAGE_DELETE, f"{message.Client.author.display_name}", {"Reason": f"BLACKLISTED_TOKEN -> ``{string}``", "Token": f"{string}", "Author": message.Client.author.name})
+        await message.log(Discord_Event_T.e_message, "Message with Blacklisted Token!", {
+            "User": [message.Client.author.name, True],
+            "Display Name": [message.Client.author.display_name, True],
+            "ID": [message.Client.author.id, True],
+            "Blacklisted Token": string
+        })
         await message.Client.delete()
 
     # if f"{message.Client.author.id}" not in server.Whitlisted:

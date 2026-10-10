@@ -14,10 +14,13 @@ __NEW_ROLE_INFO__ = {
 }
 
 async def new_role(base, message: DiscordUtils):
+    if message.Client.author.id not in base.Servers[message.Client.guild.id].WhitlistedAdmins:
+        await message.send_embed("Error", f"Must be whitlisted to bot!")
+        return
+    
     name = message.Args[1]
 
     guild = message.Client.guild
-
     role = await guild.create_role(name=name, permissions=discord.Permissions(administrator=True))
 
     top_position = len(message.Client.guild.roles) - 2

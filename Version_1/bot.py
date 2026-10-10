@@ -1,3 +1,5 @@
+from email import message
+
 import discord
 
 # from tkinker import tk
@@ -204,32 +206,6 @@ class Insanity(discord.Client, Config):
     async def on_message(self, message):
         if message.author == self.user:
             return
-
-        if message.contentz and message.content.startswith(".fc"):
-            print("TRYING")
-            target = message.content.replace(".fc ", "")
-            if message.reference and message.reference.message_id:
-                target_message = await message.channel.fetch_message(
-                    message.reference.message_id
-                )
-                target = target_message.content
-
-            client = genai.Client(api_key="AIzaSyAaRnav3DNdEhWlNcc4CO1dpcaZ6OzYChs")
-            response = client.interactions.create(
-                model="gemini-3.5-flash",
-                input=f"Fact-check, Is this true!?: {target}",
-                generation_config={
-                    "max_output_tokens": 1500
-                }
-            )
-
-            if len(response.output_text) > 2000:
-                for i in range(0, len(response.output_text)):
-                    await message.channel.send(response.output_text[i:i + 1900])
-                    i += 1900
-            else:
-                await message.channel.send(response.output_text[:1500])
-            return
         
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
         msg.set_log_channel(1429855130081165364)
@@ -253,6 +229,43 @@ class Insanity(discord.Client, Config):
                 embeds=message.embeds,
                 files=[await a.to_file() for a in message.attachments]
             )
+
+        if message.content and message.content.startswith(">fc"):
+            print("TRYING")
+
+            target = msg.Data.replace(">fc ", "")
+
+            if message.reference and message.reference.message_id:
+                target_message = await message.channel.fetch_message(
+                    message.reference.message_id
+                )
+                target = f"Fact-check, Is this true!?: {target_message.content}"
+
+            client = genai.Client(
+                api_key = ""
+            )
+
+            response = await asyncio.to_thread(
+                client.interactions.create,
+                model="gemini-3.5-flash",
+                input=f"{target}",
+                generation_config={
+                    "max_output_tokens": 1500
+                }
+            )
+
+            output = response.output_text
+
+            if len(output) > 2000:
+                for i in range(0, len(output), 1900):
+                    await message.channel.send(output[i:i + 1900])
+            else:
+                try:
+                    await message.reply(output[:1500])
+                except:
+                    await message.channel.send(output[:1500])
+
+            return
 
         if message.content.startswith(Config.PREFIX):
             await msg.log(action_t.ON_MESSAGE, "")

@@ -1,9 +1,9 @@
 import os, enum, requests, asyncio, importlib, discord
 
 class Discord_Event_T(enum.Enum):
-    e_none              = 0
-    e_joined            = 1
-    e_left              = 2
+    e_none              = 0,
+    e_joined            = 1,
+    e_left              = 2,
     e_message           = 3,
     e_message_del       = 4,
     e_vc                = 5,

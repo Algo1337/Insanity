@@ -40,10 +40,10 @@ class Insanity(discord.Client):
     Config              : Configuration
     Servers             : dict[int, Configuration] = {}
     Cogs                : dCog
-    CreatorServerID     : int = 1441933074697949247
-    CreatorLogID        : int = 1442206176766070946
-    CreatorMemeID       : int = 1526921007473098893
-    AvailableRegions    :  list[str] = [           # Available Regions
+    CreatorServerID     : int = 1556005729037717554
+    CreatorLogID        : int = 1556098185267642448
+    CreatorMemeID       : int = 1556098196999118890
+    AvailableRegions    : list[str] = [           # Available Regions
             'us-west',
             'us-east',
             'us-central',
@@ -62,6 +62,7 @@ class Insanity(discord.Client):
             'london',
             'dubai'
         ]
+    
     async def on_ready(self):
         self.Config = Configuration()
         self.Config.ServerName = "Skidville"
@@ -86,9 +87,21 @@ class Insanity(discord.Client):
         [ On Join ]
     """
     async def on_guild_join(self, guild):
+        event = DiscordUtils(self, guild, Discord_Event_T.e_joined)
+        event.log(Discord_Event_T.e_joined, "New Member Joined", {
+            "User": [event.Client.author.name, True],
+            "Display Name": [event.Client.author.display_name, True],
+            "ID": [event.Client.author.id, True]
+        })
         print(f"[ + ] Join {guild.id}")
 
     async def on_guild_leave(self, guild):
+        event = DiscordUtils(self, guild, Discord_Event_T.e_left)
+        event.log(Discord_Event_T.e_left, "New Member Joined", {
+            "User": [event.Client.author.name, True],
+            "Display Name": [event.Client.author.display_name, True],
+            "ID": [event.Client.author.id, True]
+        })
         print(f"[ + ] Join {guild.id}")
         
     async def on_member_join(self, member):
@@ -136,6 +149,7 @@ class Insanity(discord.Client):
 
         """ Message Info """
         msg = DiscordUtils(self, message, Discord_Event_T.e_message)
+        msg.set_log_channel(self.CreatorLogID)
         
         """ dCog OnMessage Handler """
         if self.OnMessage:
