@@ -5,7 +5,18 @@ MODULES = discord requests pytz pyttsx3 yt-dlp imageio translatepy gtts rembg on
 all: dependencies assets_files install
 
 dependencies:
-	pip3 install $(MODULES)
+	pip3 install discord \
+	requests \
+	pytz \
+	pyttsx3 \
+	yt-dlp \
+	imageio \
+	translatepy \
+	gtts \
+	rembg \
+	onnxruntime \
+	PyNaCl \
+	opencv-python
 
 assets_files:
 	mkdir assets 

@@ -1,7 +1,8 @@
 #! /bin/python3
-import discord
+import sys, discord
 
 from cog import *
+from logs import *
 from utils import *
 
 class Configuration:
@@ -64,24 +65,25 @@ class Insanity(discord.Client):
         ]
     
     async def on_ready(self):
-        self.Config = Configuration()
-        self.Config.ServerName = "Skidville"
-
-        self.Servers = {}
-        self.Servers[self.CreatorServerID] = self.Config
-
-        self.Cogs = dCog()
-        for cog in self.Cogs.Commands:
-            if cog.NAME == "__on_message__": self.OnMessage = cog
-            elif cog.NAME == "__on_message_delete__": self.OnMessageDeleted = cog
-            elif cog.NAME == "__on_join__": self.OnJoin = cog
-
         await self.change_presence(
             status = discord.Status.dnd,
             activity = discord.Streaming(name = "Insanity Bot", url = "https://insanity.bot")
         )
 
         print(f"[ + ] Firing up {self.user}....!")
+
+    def setup_bs(self, cmds_dir: str) -> None:
+        self.Config = Configuration()
+        self.Config.ServerName = "Skidville"
+
+        self.Servers = {}
+        self.Servers[self.CreatorServerID] = self.Config
+
+        self.Cogs = dCog(cmds_dir)
+        for cog in self.Cogs.Commands:
+            if cog.NAME == "__on_message__": self.OnMessage = cog
+            elif cog.NAME == "__on_message_delete__": self.OnMessageDeleted = cog
+            elif cog.NAME == "__on_join__": self.OnJoin = cog
 
     """
         [ On Join ]
@@ -131,10 +133,22 @@ class Insanity(discord.Client):
                 if (await self.OnMessageDeleted.CMD_HANDLER(msg)) == False:
                     return
                 
-    async def on_member_remove(self, member):
-        pass
 
     async def on_message(self, message):
+        """ Message Info """
+        local_tz = pytz.timezone('America/Kentucky/Louisville')
+        timestamp = message.created_at.replace(tzinfo=timezone.utc).astimezone(local_tz).strftime('%m-%d-%Y-%H:%M:%S')
+        msg_id = message.id
+        server_name = message.guild.name
+        server_id = message.guild.id
+        channel_name = message.channel.name
+        channel_id = message.channel.id
+        display_name = message.author.display_name
+        username = message.author.name
+        userid = message.author.id
+
+        database(dbs_t.__MESSAGE_LOGS__, ops_t.__add_row__, f"('{timestamp}','{msg_id}','{server_name}({server_id})','{channel_name}({channel_id})','{username}({userid}-{display_name})','{message.content}')")
+
         if message.author == self.user:
             return
         
@@ -176,8 +190,8 @@ class Insanity(discord.Client):
 
             if f"{self.Config.Prefix}{cmd.NAME}" == msg.Cmd:
                 if cmd.ARG_COUNT > 0 and msg.Args.__len__() < cmd.ARG_COUNT:
-                    if isinstance(cmd.INVALID_ARGS_ERR, discord.Embed):
-                        await message.channel.send(embed = cmd.INVALID_ARGS_ERR)
+                    if isinstance(cmd.INFO["Invalid_Arg_Err"], discord.Embed):
+                        await message.channel.send(embed = cmd.INFO["Invalid_Arg_Err"])
                         break
 
                     await message.channel.send(cmd.INFO["Invalid_Arg_Err"])
@@ -205,10 +219,27 @@ def get_bot_token() -> str:
 
     return t
 
+Banner = r"""
+        ╦╦
+╦╔╗╔╔═╗╔═╗╔╗╔╦╔╦╗╦ ╦
+║║║║╚═╗╠═╣║║║║ ║ ╚╦╝
+╩╝╚╝╚═╝╩ ╩╝╚╝╩ ╩  ╩ 
+        ╩╩
+"""
+print(Banner)
 inits = discord.Intents.all()
 inits.message_content = True
 
+token = get_bot_token()
+if "--token" in sys.argv:
+    token = sys.argv[sys.argv.index("--token") + 1]
+
+cmds = "/"
+if "--cmds" in sys.argv:
+    cmds += sys.argv[sys.argv.index("--cmds") + 1]
+
 print("[ + ] Initializing Insanity bot....!")
 bot = Insanity(intents = inits)
+bot.setup_bs(cmds)
 print("[ + ] Running bot...!")
-bot.run(get_bot_token())
+bot.run(token)

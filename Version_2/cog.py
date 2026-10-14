@@ -48,9 +48,9 @@ class Cog:
         self.INVALID_ARGS_ERR = invalid_args_err
 
 class dCog:
-    DEFAULT_DIR         : str = "/cmds"
+    DEFAULT_DIR         : str = ""
     Commands            : list[Cog] = []
-    def __init__(self, dir_path: str = None):
+    def __init__(self, dir_path: str):
         if dir_path:
             self.DEFAULT_DIR = dir_path
 

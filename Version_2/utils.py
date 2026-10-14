@@ -34,6 +34,14 @@ class DiscordUtils():
     rChannel    : str | int = None
     Client_T    : Discord_Event_T = Discord_Event_T.e_none
     LogChannel  : int = None
+
+    """
+        Some Message Default Settings
+    """
+    __Embed_Thumbnail       : str = None
+    __Embed_Author_Name     : str = None
+    __Embed_Author_Image    : str = None
+    __Embed_Footer          : str = None
     def __init__(self, dClient, message, event_t: Discord_Event_T):
         self.dClient = dClient
         self.Client_T = event_t
@@ -60,6 +68,22 @@ class DiscordUtils():
     def set_redirect_channel(self, chan: int | str) -> None:
         self.Redirect = True
         self.rChannel = chan
+
+    def set_default_embed_info(self, thumbnail: str, author_name: str, author_image: str, footer: str) -> None:
+        self.__Embed_Thumbnail = thumbnail
+        self.__Embed_Author_Name = author_name
+        self.__Embed_Author_Image = author_image
+        self.__Embed_Footer = footer
+
+    def add_default_embed_info(self, embed: discord.Embed) -> None:
+        if self.__Embed_Author_Name or self.__Embed_Author_Image:
+            embed.set_author(name = self.__Embed_Author_Name, url = self.__Embed_Author_Image)
+
+        if self.__Embed_Footer:
+            embed.set_footer(text = self.__Embed_Footer)
+
+        if self.__Embed_Thumbnail:
+            embed.set_thumbnail(url = self.__Embed_Thumbnail)
 
     """ Log to discord channel """
     async def log(self, action: Discord_Event_T, data: str, fields: dict[str, str] = None) -> None:
@@ -214,6 +238,7 @@ class DiscordUtils():
         if image != None:
             embed.set_image(url = image)
 
+        self.add_default_embed_info(embed)
         await self.Client.channel.send(embed = embed)
 
     def get_emojis(self, data: str = None) -> list:
